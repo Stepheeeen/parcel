@@ -9,7 +9,7 @@ const SignInForm = () => (
       <InputField type="email" placeholder="Email" />
       <InputField type="password" placeholder="Password" />
       <a
-        href="/Authentication/Forget-password"
+        href="authentication/forget-password"
         className="text-sm text-yellow-400 text-right mb-4"
       >
         Forgot Password?
@@ -20,7 +20,7 @@ const SignInForm = () => (
     <Button label="Continue With Google" variant="secondary" />
     <p className="text-center text-sm mt-4">
       Don't Have An Account?{" "}
-      <a href="/Authentication/Signup" className="text-yellow-400">
+      <a href="/authentication/signup" className="text-yellow-400">
         Sign Up
       </a>
     </p>

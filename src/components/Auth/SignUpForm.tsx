@@ -22,7 +22,7 @@ const SignUpForm = () => (
     <Button label="Continue With Google" variant="secondary" />
     <p className="text-center text-sm mt-4">
       Already Have An Account?{" "}
-      <a href="/Authentication/Signin" className="text-yellow-400">
+      <a href="/authentication/signin" className="text-yellow-400">
         Sign In
       </a>
     </p>
