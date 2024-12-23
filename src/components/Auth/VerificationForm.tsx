@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/input-otp";
 
 const VerificationForm = () => (
-  <div className="p-6 bg-white rounded-md max-w-md mx-auto">
+  <div className="p-6 bg-white rounded-md max-w-md mx-auto shadow-md">
     <h2 className="text-2xl font-bold mb-4">Email Verification</h2>
     <p className="text-sm text-gray-500 mb-4">
       A 6-digit code was sent to your email.
