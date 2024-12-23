@@ -1,5 +1,5 @@
 import SignUpForm from "@/components/Auth/SignUpForm";
-import React from "react";
+import React, { useState } from "react";
 
 const index = () => {
   return (

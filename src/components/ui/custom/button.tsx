@@ -1,6 +1,6 @@
 interface ButtonProps {
     label: any;
-    onClick?: () => void;
+    onClick?: any;
     variant?: "primary" | "secondary";
   }
   
