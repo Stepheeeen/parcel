@@ -1,4 +1,10 @@
 import Button from "../ui/custom/button";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 const ForgotPasswordForm = () => (
   <div className="p-6 bg-white rounded-md max-w-md mx-auto">
@@ -6,16 +12,16 @@ const ForgotPasswordForm = () => (
     <p className="text-sm text-gray-500 mb-4">
       A 6-digit code was sent to your email.
     </p>
-    <div className="flex gap-2 justify-center mb-4">
-      {[...Array(6)].map((_, i) => (
-        <input
-          key={i}
-          maxLength={1}
-          className="w-12 h-12 text-center border border-gray-300 rounded-md"
-        />
-      ))}
+    <div className="flex justify-between gap-2 mb-6">
+      <InputOTP maxLength={6}>
+        {[0, 1, 2, 3, 4, 5].map((index) => (
+          <InputOTPGroup key={`group-1-${index}`}>
+            <InputOTPSlot index={index} className="p-6" />
+          </InputOTPGroup>
+        ))}
+      </InputOTP>
     </div>
-    <Button label="Proceed" />
+    {/* <Button label="Proceed" /> */}
   </div>
 );
 

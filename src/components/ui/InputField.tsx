@@ -10,7 +10,7 @@ interface InputFieldProps {
       <input
         type={type}
         placeholder={placeholder}
-        className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        className="w-full border border-gray-300 rounded-full px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400"
       />
     </div>
   );
