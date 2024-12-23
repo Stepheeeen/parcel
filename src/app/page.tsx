@@ -19,19 +19,19 @@ const LandingPage = () => {
       icon: <Clock className="w-8 h-8 text-yellow-500" />,
       title: "Same Day Delivery",
       description:
-        "Get your packages delivered within hours, not days. We prioritize speed without compromising safety.",
+        "Get your packages delivered within minutes or just a few hours, not days. We prioritize speed without compromising safety.",
     },
     {
       icon: <Shield className="w-8 h-8 text-yellow-500" />,
       title: "Secure Shipping",
       description:
-        "End-to-end package tracking and insurance coverage. Your items are protected throughout their journey.",
+        "End-to-end package tracking. Your items are protected throughout their journey.",
     },
     {
       icon: <Truck className="w-8 h-8 text-yellow-500" />,
-      title: "Nationwide Coverage",
+      title: "Citywide Coverage",
       description:
-        "Delivery services available across the country, reaching even the most remote locations.",
+        "Delivery services available across Lokoja city, reaching even the most remote locations.",
     },
   ];
 
@@ -60,17 +60,17 @@ const LandingPage = () => {
 
   const testimonials = [
     {
-      name: "John Doe",
+      name: "Esther",
       review:
         "Parcel's service is unmatched. My package arrived on time and in perfect condition! The tracking feature kept me informed throughout the delivery process.",
-      location: "Lagos, Nigeria",
+      location: "Adankolo, Lokoja",
       rating: 5,
     },
     {
-      name: "Jane Smith",
+      name: "Abass",
       review:
-        "I love the real-time tracking feature. It gives me peace of mind knowing exactly where my package is at all times. The customer service is exceptional!",
-      location: "Abuja, Nigeria",
+        "I love the real-time tracking feature. It gives me peace of mind knowing the status of my package at all times. The customer service is exceptional!",
+      location: "Ganaja, Lokoja",
       rating: 5,
     },
   ];
@@ -285,7 +285,7 @@ const LandingPage = () => {
             <div className="flex flex-col items-center p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
               <MapPin className="w-8 h-8 text-yellow-500" />
               <h3 className="mt-4 text-xl font-semibold">Location</h3>
-              <p className="mt-2 text-gray-600">Lagos, Nigeria</p>
+              <p className="mt-2 text-gray-600">Lokoja, Nigeria</p>
             </div>
           </div>
         </div>
@@ -301,7 +301,7 @@ const LandingPage = () => {
                 <span className="text-xl font-bold text-white">Parcel</span>
               </div>
               <p className="mt-4">
-                Making delivery simple and efficient across Nigeria.
+                Making delivery simple and efficient across Lokoja city.
               </p>
             </div>
             <div>
@@ -372,7 +372,7 @@ const LandingPage = () => {
                   <Mail className="w-4 h-4 mr-2" /> support@parcel.com
                 </li>
                 <li className="flex items-center">
-                  <MapPin className="w-4 h-4 mr-2" /> Lagos, Nigeria
+                  <MapPin className="w-4 h-4 mr-2" /> Lokoja, Nigeria
                 </li>
               </ul>
             </div>
