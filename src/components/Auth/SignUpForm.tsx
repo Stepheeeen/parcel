@@ -1,12 +1,14 @@
 "use client"
 import { useState } from "react";
+import { FcGoogle } from "react-icons/fc";
 import Button from "../ui/custom/button";
 import InputField from "../ui/InputField";
-import { DEV_URL } from "../../../constants";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 const SignUpForm = () => {
   const router = useRouter();
+  const { toast } = useToast()
 
   const [formData, setFormData] = useState({
     username: "",
@@ -25,14 +27,12 @@ const SignUpForm = () => {
   }
 
    const handleSubmit = async (e:any) => {
-    console.log(formData)
-
     if(!formData.agreeToTerms){
-      console.log("You have to agree to terms in order to proceed")
+      toast({title: "Validation Error", description: "You have to agree to terms in order to proceed", variant: "destructive"})
     }
 
     if(formData.confirmPassword !== formData.password){
-      console.log("Password does not match")
+      toast({title: "Validation Error", description: "Password does not match", variant: "destructive"})
     }
 
     e.preventDefault();
@@ -48,20 +48,21 @@ const SignUpForm = () => {
 
       if(response.status < 300 && response.status >= 200){
         router.replace("/application/verify");
+      }else{
+        const data = await response.json();
+        toast({title: "Error", description: data.message})
       }
 
-      console.log(await response.json());
-
     } catch (error) {
-      console.error('Signup failed:', error);
+      toast({title: "Error", description: e?.message ? e.message: e, variant: "destructive"})
     }
   };
 
   return(
-      <div className="p-6 bg-white rounded-md w-full md:max-w-md mx-auto h-full md:h-auto">
+      <div className="p-6 bg-white rounded-md w-full md:max-w-md mx-auto h-full md:h-auto shadow-md">
         <h2 className="text-3xl font-bold mb-1 mx-1">Let's Get Started</h2>
         <p className="mb-6 md:mb-3 mx-1">Fill in the fields, let’s get to know you.</p>
-        <form className="flex flex-col gap-4">
+        <form className="flex flex-col gap-4 my-4">
           <InputField type="text" placeholder="Username" 
             name="username"
           value={formData.username}
@@ -92,15 +93,23 @@ const SignUpForm = () => {
         </div>
         <Button label="Proceed" onClick={handleSubmit}/>
         <div className="text-center my-1 text-base">Or</div>
-        <Button label="Continue With Google" variant="secondary" />
+        <Button
+      label={
+        <div className="flex items-center justify-center gap-3">
+          <FcGoogle size={35}/>
+          <p>Continue With Google</p>
+        </div>
+      }
+      variant="secondary"
+    />
         <p className="text-center text-sm mt-4">
           Already Have An Account?{" "}
           <a href="/authentication/signin" className="text-yellow-400">
             Sign In
           </a>
         </p>
-  </div>
-  )
+        </div>
+      )
 };
 
 export default SignUpForm;

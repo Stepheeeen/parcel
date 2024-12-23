@@ -12,16 +12,16 @@ const ForgotPasswordForm = () => (
     <p className="text-sm text-gray-500 mb-4">
       A 6-digit code was sent to your email.
     </p>
-    <div className="flex justify-between gap-2 mb-6">
+    <div className="flex justify-between mb-14 gap-3">
       <InputOTP maxLength={6}>
         {[0, 1, 2, 3, 4, 5].map((index) => (
           <InputOTPGroup key={`group-1-${index}`}>
-            <InputOTPSlot index={index} className="p-6" />
+            <InputOTPSlot index={index} className="p-7 text-2xl" />
           </InputOTPGroup>
         ))}
       </InputOTP>
     </div>
-    {/* <Button label="Proceed" /> */}
+    <Button label="Proceed" />
   </div>
 );
 
