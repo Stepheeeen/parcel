@@ -85,12 +85,12 @@ const SignUpForm = () => {
   return (
     <>
       {loading && <Loader />}
-      <div className="p-6 bg-white rounded-md w-full md:max-w-md mx-auto h-full md:h-auto shadow-md">
+      <div className="p-6 py-10 md:py-6 bg-white rounded-md w-full md:max-w-md mx-auto h-auto shadow-none md:shadow-md">
         <h2 className="text-3xl font-bold mb-1 mx-1">Let's Get Started</h2>
         <p className="mb-6 md:mb-3 mx-1">
           Fill in the fields, let’s get to know you.
         </p>
-        <form className="flex flex-col gap-4 my-4">
+        <form className="flex flex-col gap-4 w-full mt-7 space-y-2">
           <InputField
             type="text"
             placeholder="Username"
@@ -120,7 +120,7 @@ const SignUpForm = () => {
             onChange={handleChange}
           />
         </form>
-        <div className="flex items-center gap-2 mt-3 mb-5 mx-2">
+        <div className="flex items-center gap-2 my-3 mb-10 md:mb-7">
           <input
             type="checkbox"
             className="cursor-pointer"
@@ -133,8 +133,9 @@ const SignUpForm = () => {
           </p>
         </div>
         <Button label="Proceed" onClick={handleSubmit} />
-        <div className="text-center my-1 text-base">Or</div>
+        <div className="text-center my-2 text-sm">Or</div>
         <Button
+        disabled={true}
           label={
             <div className="flex items-center justify-center gap-3">
               <FcGoogle size={35} />
