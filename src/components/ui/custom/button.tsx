@@ -2,9 +2,10 @@ interface ButtonProps {
     label: any;
     onClick?: any;
     variant?: "primary" | "secondary";
+    disabled?: any;
   }
   
-  const Button = ({ label, onClick, variant = "primary" }: ButtonProps) => (
+  const Button = ({ label, onClick, variant = "primary", disabled }: ButtonProps) => (
     <button
       onClick={onClick}
       className={`w-full py-3 rounded-full font-medium ${

@@ -29,10 +29,12 @@ const SignUpForm = () => {
    const handleSubmit = async (e:any) => {
     if(!formData.agreeToTerms){
       toast({title: "Validation Error", description: "You have to agree to terms in order to proceed", variant: "destructive"})
+      return
     }
 
     if(formData.confirmPassword !== formData.password){
       toast({title: "Validation Error", description: "Password does not match", variant: "destructive"})
+      return
     }
 
     e.preventDefault();
@@ -47,14 +49,17 @@ const SignUpForm = () => {
       });
 
       if(response.status < 300 && response.status >= 200){
-        router.replace("/application/verify");
+        localStorage.setItem("v-email-auth", email);
+        router.replace("/authentication/verify");
       }else{
         const data = await response.json();
-        toast({title: "Error", description: data.message})
+        toast({title: "Error", description: data.message, variant: "destructive"})
+        return
       }
 
     } catch (error) {
       toast({title: "Error", description: e?.message ? e.message: e, variant: "destructive"})
+      return
     }
   };
 
