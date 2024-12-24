@@ -5,6 +5,7 @@ import Link from "next/link";
 import { IUser, useAuth } from "@/context/AuthContext";
 import { Loader } from "../ui/custom/loader";
 import { getDate } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface IOrder {
   _id: string;
@@ -38,6 +39,7 @@ const DeliveryTracking = () => {
   const page = useRef(1);
   const limit = useRef(10);
 
+  const router = useRouter();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -73,7 +75,7 @@ const DeliveryTracking = () => {
         <div className="flex justify-between items-center mt-4">
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
-              <Package size={32} />
+              <Package size={32} onClick={() => router.replace("/user/profile")}/>
             </div>
             <h1 className="text-2xl font-bold hidden lg:block">Delivery Dashboard</h1>
           </div>
@@ -93,7 +95,9 @@ const DeliveryTracking = () => {
           {/* Ongoing Delivery Section */}
           <div className="lg:col-span-2">
             <h2 className="text-xl font-bold mt-6 lg:mt-0">Newest Order</h2>
-            <div className="bg-white rounded-xl shadow-md p-4 mt-2 lg:p-6">
+            {
+              latestOrder?._id? (
+              <div className="bg-white rounded-xl shadow-md p-4 mt-2 lg:p-6">
               <div className="flex justify-between">
                 <span className="capitalize bg-yellow-200 text-yellow-700 px-2 py-1 rounded-md">
                   {latestOrder?.paymentStatus}
@@ -119,6 +123,12 @@ const DeliveryTracking = () => {
                 Rider's Name: <strong className="capitalize">{latestOrder?.rider.firstname + " " + latestOrder?.rider.lastname}</strong>
               </p>
             </div>
+              ): (
+                <div className="bg-white rounded-xl shadow-md p-4 mt-2 lg:p-6 text-center text-yellow-500">
+                  You are yet to place an order
+                </div>
+              )
+            }
           </div>
 
           {/* Recently Delivered Section */}
@@ -130,7 +140,9 @@ const DeliveryTracking = () => {
               </a>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-4 mt-2 lg:p-6 space-y-4">
+            {
+              latestOrder?._id ? (
+              <div className="bg-white rounded-xl shadow-md p-4 mt-2 lg:p-6 space-y-4">
               {orders?.map((item) => (
                 <div 
                   key={item._id} 
@@ -149,6 +161,10 @@ const DeliveryTracking = () => {
                 </div>
               ))}
             </div>
+              ): (
+              <div></div>
+              )
+            }
           </div>
         </div>
       </div>

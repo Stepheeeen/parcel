@@ -7,10 +7,23 @@ import { Card, CardContent } from "@/components/ui/card";
 import Button from "../ui/custom/button";
 import InputField from "../ui/InputField";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect, useState } from "react";
+import { Loader } from "../ui/custom/loader";
 
 const UserProfile = () => {
+  const { user, accessToken } = useAuth();
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    if(user){
+      setIsLoading(false);
+    }
+  }, [])
+
   return (
-    <div className="min-h-screen bg-gray-50/50">
+    isLoading? (<Loader/>): (
+      <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
       <div className="bg-white p-4 flex items-center justify-between border-b">
         <div className="flex items-center justify-between w-full gap-4">
@@ -73,6 +86,7 @@ const UserProfile = () => {
         </div>
       </div>
     </div>
+    )
   );
 };
 
