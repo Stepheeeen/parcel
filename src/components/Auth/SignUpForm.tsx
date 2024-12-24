@@ -29,15 +29,16 @@ const SignUpForm = () => {
    const handleSubmit = async (e:any) => {
     if(!formData.agreeToTerms){
       toast({title: "Validation Error", description: "You have to agree to terms in order to proceed", variant: "destructive"})
+      return
     }
 
     if(formData.confirmPassword !== formData.password){
       toast({title: "Validation Error", description: "Password does not match", variant: "destructive"})
+      return
     }
 
     e.preventDefault();
     try {
-
       const {email, password, username} = formData;
 
       const response = await fetch(`/api/users/register`, {
@@ -47,14 +48,17 @@ const SignUpForm = () => {
       });
 
       if(response.status < 300 && response.status >= 200){
-        router.replace("/application/verify");
+        localStorage.setItem("v-email-auth", email);
+        router.replace("/authentication/verify");
       }else{
         const data = await response.json();
-        toast({title: "Error", description: data.message})
+        toast({title: "Error", description: data.message, variant: "destructive"})
+        return
       }
 
     } catch (error) {
       toast({title: "Error", description: e?.message ? e.message: e, variant: "destructive"})
+      return
     }
   };
 
@@ -64,12 +68,12 @@ const SignUpForm = () => {
         <p className="mb-6 md:mb-3 mx-1">Fill in the fields, let’s get to know you.</p>
         <form className="flex flex-col gap-4 my-4">
           <InputField type="text" placeholder="Username" 
-            name="username"
+          name="username"
           value={formData.username}
           onChange={handleChange}/>
           <InputField type="email" placeholder="Email" 
-            name="email"
-              value={formData.email}
+          name="email"
+          value={formData.email}
           onChange={handleChange}
           />
           <InputField type="password" placeholder="Password" 
