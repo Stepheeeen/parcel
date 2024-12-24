@@ -10,9 +10,11 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { Loader } from "../ui/custom/loader";
+import { useToast } from "@/hooks/use-toast";
 
 const UserProfile = () => {
-  const { user, accessToken } = useAuth();
+  const { user, logout } = useAuth();
+  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
@@ -20,6 +22,22 @@ const UserProfile = () => {
       setIsLoading(false);
     }
   }, [])
+
+  const handleLogOut = async () => {
+    setIsLoading(true);
+    try {
+     logout();
+    } catch (e:any) {
+      toast({
+        title: "Error",
+        description: e?.message ? e.message : e,
+        variant: "destructive",
+      });
+      return;
+    }finally{
+      setIsLoading(false);
+    }
+  }
 
   return (
     isLoading? (<Loader/>): (
@@ -41,8 +59,8 @@ const UserProfile = () => {
         <div className="flex justify-center mb-8 relative">
           <div className="relative">
             <Avatar className="h-24 w-24 bg-purple-100">
-              <AvatarImage src="https://api.dicebear.com/7.x/notionists/svg?seed=aurora" />
-              <AvatarFallback>AU</AvatarFallback>
+              <AvatarImage src={`https://api.dicebear.com/7.x/notionists/svg?seed=${user?.username || "david"}`} />
+              <AvatarFallback>{user ? (user?.username.charAt(0).toUpperCase() + user?.username.charAt(1).toUpperCase()) : "AU"}</AvatarFallback>
             </Avatar>
           </div>
         </div>
@@ -60,11 +78,11 @@ const UserProfile = () => {
               {/* <CardContent className="p-4 space-y-4"> */}
               <div>
                 {/* <label className="text-sm text-gray-500">Username</label> */}
-                <InputField placeholder="Aurora" type="text" />
+                <InputField placeholder={`${user?.username || "username"}`} type="text" />
               </div>
               <div className="mb-9">
                 {/* <label className="text-sm text-gray-500">Email</label> */}
-                <InputField placeholder="aurora@gmail.com" type="email" />
+                <InputField placeholder={`${user?.email || "parcel@gmail.com"}`} type="email" />
               </div>
 
               {/* </CardContent> */}
@@ -80,7 +98,7 @@ const UserProfile = () => {
 
           {/* Action Buttons */}
           <div className="space-y-4 pt-6 px-2 md:px-4">
-            <Button label={"Logout"} />
+            <Button label={"Logout"} onClick={handleLogOut}/>
             <Button label={"Delete Account"} variant={"secondary"} />
           </div>
         </div>

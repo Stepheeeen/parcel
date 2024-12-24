@@ -29,6 +29,7 @@ const Stepper = () => {
     toLocation: "",
   });
 
+
   const handleNext = () => {
     if (currentStep < steps.length) setCurrentStep(currentStep + 1);
   };
@@ -149,9 +150,20 @@ const Stepper = () => {
                 <SelectValue placeholder="From Location" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="new-york">New York</SelectItem>
-                <SelectItem value="los-angeles">Los Angeles</SelectItem>
-                <SelectItem value="chicago">Chicago</SelectItem>
+                <SelectItem value="Adankolo">Adankolo</SelectItem>
+                <SelectItem value="Adankolo FUL Street">Adankolo FUL Street</SelectItem>
+                <SelectItem value="Ganaja">Ganaja</SelectItem>
+                <SelectItem value="Crusher">Crusher</SelectItem>
+                <SelectItem value="GRA">GRA</SelectItem>
+                <SelectItem value="Zone 8">Zone 8</SelectItem>
+                <SelectItem value="Kpata">Kpata</SelectItem>
+                <SelectItem value="Cantonment">Cantonment</SelectItem>
+                <SelectItem value="Phase II">Phase II</SelectItem>
+                <SelectItem value="Zango">Zango</SelectItem>
+                <SelectItem value="Felele GT">Felele GT</SelectItem>
+                <SelectItem value="Felele Unique Hotel">Felele Unique Hotel</SelectItem>
+                <SelectItem value="Felele">Felele</SelectItem>
+                <SelectItem value="Lokongoma">Lokongoma</SelectItem>
               </SelectContent>
             </Select>
 
@@ -165,9 +177,20 @@ const Stepper = () => {
                 <SelectValue placeholder="To Location" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="san-francisco">San Francisco</SelectItem>
-                <SelectItem value="houston">Houston</SelectItem>
-                <SelectItem value="miami">Miami</SelectItem>
+                  <SelectItem value="Adankolo">Adankolo</SelectItem>
+                <SelectItem value="Adankolo FUL Street">Adankolo FUL Street</SelectItem>
+                <SelectItem value="Ganaja">Ganaja</SelectItem>
+                <SelectItem value="Crusher">Crusher</SelectItem>
+                <SelectItem value="GRA">GRA</SelectItem>
+                <SelectItem value="Zone 8">Zone 8</SelectItem>
+                <SelectItem value="Kpata">Kpata</SelectItem>
+                <SelectItem value="Cantonment">Cantonment</SelectItem>
+                <SelectItem value="Phase II">Phase II</SelectItem>
+                <SelectItem value="Zango">Zango</SelectItem>
+                <SelectItem value="Felele GT">Felele GT</SelectItem>
+                <SelectItem value="Felele Unique Hotel">Felele Unique Hotel</SelectItem>
+                <SelectItem value="Felele">Felele</SelectItem>
+                <SelectItem value="Lokongoma">Lokongoma</SelectItem>
               </SelectContent>
             </Select>
           </div>

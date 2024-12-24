@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      await fetch("/api/user/logout", {
+      await fetch("/api/users/logout", {
         method: "POST",
         body: JSON.stringify({ refreshToken }),
       });
