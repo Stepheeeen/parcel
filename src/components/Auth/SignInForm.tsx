@@ -10,7 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 const SignInForm = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const { login } = useAuth(); 
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -56,13 +56,17 @@ const SignInForm = () => {
 
       const data = await response.json();
 
-      if(response.ok){
-         localStorage.setItem("user_data", JSON.stringify(data))
-        
-         login(data.user, data.accessToken, data.refreshToken);
-      }else{
-        toast({title: "Error", description: data.message, variant: "destructive"})
-        return
+      if (response.ok) {
+        localStorage.setItem("user_data", JSON.stringify(data));
+
+        login(data.user, data.accessToken, data.refreshToken);
+      } else {
+        toast({
+          title: "Error",
+          description: data.message,
+          variant: "destructive",
+        });
+        return;
       }
     } catch (error) {
       toast({
@@ -79,10 +83,12 @@ const SignInForm = () => {
   return (
     <>
       {loading && <Loader />}
-      <div className="p-6 bg-white rounded-md w-full md:max-w-md mx-auto h-full md:h-auto shadow-md">
-        <h2 className="text-3xl font-bold mb-1 mx-1">Welcome Back</h2>
+      <div className="p-6 py-10 md:py-6 bg-white rounded-md w-full md:max-w-md mx-auto h-auto shadow-none md:shadow-md">
+        <h2 className="text-3xl font-bold mb-1 mx-1 mt-10 md:mt-0">
+          Welcome Back
+        </h2>
         <p className="mb-6 md:mb-3 mx-1">login into your account.</p>
-        <form className="flex flex-col gap-4 w-full">
+        <form className="flex flex-col gap-4 w-full mt-7 space-y-2">
           <InputField
             type="email"
             placeholder="Email"
@@ -97,16 +103,17 @@ const SignInForm = () => {
             value={formData.password}
             onChange={handleChange}
           />
-          <a
-            href="authentication/forget-password"
-            className="text-sm text-yellow-400 text-right mb-4"
-          >
-            Forgot Password?
-          </a>
         </form>
+        <a
+          href="authentication/forget-password"
+          className="text-md text-yellow-400 float-right my-3 mb-10 md:mb-7"
+        >
+          Forgot Password?
+        </a>
         <Button label="Proceed" onClick={handleSubmit} />
-        <div className="text-center my-1 text-base">Or</div>
+        <div className="text-center my-2 text-sm">Or</div>
         <Button
+        disabled={true}
           label={
             <div className="flex items-center justify-center gap-3">
               <FcGoogle size={35} />

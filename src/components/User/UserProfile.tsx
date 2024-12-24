@@ -59,8 +59,8 @@ const UserProfile = () => {
         <div className="flex justify-center mb-8 relative">
           <div className="relative">
             <Avatar className="h-24 w-24 bg-purple-100">
-              <AvatarImage src={`https://api.dicebear.com/7.x/notionists/svg?seed=${user?.username || "david"}`} />
-              <AvatarFallback>{user ? (user?.username.charAt(0).toUpperCase() + user?.username.charAt(1).toUpperCase()) : "AU"}</AvatarFallback>
+              <AvatarImage src={`https://api.dicebear.com/7.x/notionists/svg?seed=${user?.username || "Username"}`} />
+              <AvatarFallback>{user ? (user?.username.charAt(0).toUpperCase() + user?.username.charAt(1).toUpperCase()) : "UN"}</AvatarFallback>
             </Avatar>
           </div>
         </div>
