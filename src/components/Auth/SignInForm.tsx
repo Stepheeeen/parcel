@@ -98,7 +98,7 @@ const SignInForm = () => {
             onChange={handleChange}
           />
           <a
-            href="authentication/forget-password"
+            href="forget-password"
             className="text-sm text-yellow-400 text-right mb-4"
           >
             Forgot Password?
