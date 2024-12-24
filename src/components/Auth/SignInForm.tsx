@@ -2,15 +2,15 @@
 import { FcGoogle } from "react-icons/fc";
 import Button from "../ui/custom/button";
 import InputField from "../ui/InputField";
-import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { Loader } from "../ui/custom/loader";
+import { useAuth } from "@/context/AuthContext";
 
 const SignInForm = () => {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const { toast } = useToast();
+  const { login } = useAuth(); 
 
   const [formData, setFormData] = useState({
     email: "",
@@ -56,21 +56,13 @@ const SignInForm = () => {
 
       const data = await response.json();
 
-      if (response.status < 300 && response.status >= 200) {
-        localStorage.setItem("user_data", JSON.stringify(data));
-
-        if (data.user?.role && data.user?.role === "rider") {
-          router.replace("/rider/home");
-        } else if (data.user?.role === "user") {
-          router.replace("/user/home");
-        }
-      } else {
-        toast({
-          title: "Error",
-          description: data.message,
-          variant: "destructive",
-        });
-        return;
+      if(response.ok){
+         localStorage.setItem("user_data", JSON.stringify(data))
+        
+         login(data.user, data.accessToken, data.refreshToken);
+      }else{
+        toast({title: "Error", description: data.message, variant: "destructive"})
+        return
       }
     } catch (error) {
       toast({

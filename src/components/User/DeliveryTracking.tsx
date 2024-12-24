@@ -1,10 +1,72 @@
-import React from "react";
+"use client"
+import React, { useEffect, useRef, useState } from "react";
 import { Bell, Plus, Package, Circle } from "lucide-react";
 import Link from "next/link";
+import { IUser, useAuth } from "@/context/AuthContext";
+import { Loader } from "../ui/custom/loader";
+import { getDate } from "@/lib/utils";
+
+interface IOrder {
+  _id: string;
+  orderId: string;
+  receiverPhone: string;
+  receiverName: string;
+  receiversAddress: string;
+  descr: string;
+  sender: IUser;
+  status: string;
+  paymentStatus: string;
+  receiver?: IUser;
+  timeOfArrival?: Date;
+  cost: string;
+  address: string;
+  rider: IUser;
+  gatewayPaymentId?: string;
+  externalReference?: string;
+  authorizationCode?: string;
+  updatedAt: Date;
+  createdAt: Date;
+}
 
 const DeliveryTracking = () => {
+  const { user, accessToken } = useAuth();
+  const [orders, setOrders] = useState<IOrder[] | null>(null)
+  const [hasMore, setHasMore] = useState<boolean>(true)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [latestOrder, setLatestOrder] = useState<IOrder | null>(null)
+
+  const page = useRef(1);
+  const limit = useRef(10);
+
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if(!hasMore) return;
+      const response = await fetch(`/api/orders?page=${page.current}&limit=${limit.current}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        }
+      })
+
+      const data = await response.json();
+
+      if(response.ok){
+        setOrders(data.docs);
+        setLatestOrder(data.docs[data.docs.length -1])
+        setHasMore(data.hasMore);
+        setIsLoading(false);
+      }else{
+        setIsLoading(true);
+      }
+    }
+    fetchOrders();
+  }, [])
+
+
   return (
-    <div className="bg-gray-50 min-h-screen p-4 lg:p-8">
+    isLoading ? (<Loader/>): (
+      <div className="bg-gray-50 min-h-screen p-4 lg:p-8">
       {/* Container for larger screens */}
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -30,31 +92,31 @@ const DeliveryTracking = () => {
         <div className="lg:grid lg:grid-cols-3 lg:gap-8 lg:mt-8">
           {/* Ongoing Delivery Section */}
           <div className="lg:col-span-2">
-            <h2 className="text-xl font-bold mt-6 lg:mt-0">Ongoing Delivery</h2>
+            <h2 className="text-xl font-bold mt-6 lg:mt-0">Newest Order</h2>
             <div className="bg-white rounded-xl shadow-md p-4 mt-2 lg:p-6">
               <div className="flex justify-between">
-                <span className="bg-yellow-200 text-yellow-700 px-2 py-1 rounded-md">
-                  Transit
+                <span className="capitalize bg-yellow-200 text-yellow-700 px-2 py-1 rounded-md">
+                  {latestOrder?.paymentStatus}
                 </span>
-                <span className="text-gray-500">Friday Aug 19, 2024</span>
+                <span className="text-gray-500">{latestOrder?.updatedAt ? getDate(new Date(latestOrder?.updatedAt)) : getDate(new Date())}</span>
               </div>
-              <h3 className="text-2xl font-bold my-2 lg:text-3xl">E-F4RH996N</h3>
+              <h3 className="text-2xl font-bold my-2 lg:text-3xl capitalize">{latestOrder?.status}</h3>
               <div className="flex justify-between mt-2 lg:mt-4">
                 <div className="flex items-center space-x-1">
-                  <Circle size={16} className="text-yellow-500" />
+                  <Circle size={16} className={`${latestOrder?.status === "accepted" ?"text-gray-500": "text-yellow-500"} capitalize`} />
                   <span>Picked</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <Circle size={16} className="text-yellow-500" />
+                  <Circle size={16} className={`${latestOrder?.status === "transit" ?"text-gray-500": "text-yellow-500"} capitalize`} />
                   <span>Delivery</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <Circle size={16} className="text-gray-400" />
+                  <Circle size={16} className={`${latestOrder?.status === "delivered" ?"text-gray-500": "text-yellow-500"} capitalize`} />
                   <span>Delivered</span>
                 </div>
               </div>
               <p className="text-gray-500 mt-2 lg:mt-4">
-                Rider's Name: <strong>Peter Kwankwanso</strong>
+                Rider's Name: <strong className="capitalize">Peter Kwankwanso</strong>
               </p>
             </div>
           </div>
@@ -62,20 +124,16 @@ const DeliveryTracking = () => {
           {/* Recently Delivered Section */}
           <div>
             <div className="flex justify-between items-center mt-6 lg:mt-0">
-              <h2 className="text-xl font-bold">Recently Delivered</h2>
+              <h2 className="text-xl font-bold">Recent Orders</h2>
               <a href="#" className="text-gray-500 hover:underline">
                 See All
               </a>
             </div>
 
             <div className="bg-white rounded-xl shadow-md p-4 mt-2 lg:p-6 space-y-4">
-              {[
-                { id: "F-G5SI007O", status: "Completed", color: "text-green-500" },
-                { id: "F-G5SI007O", status: "Cancelled", color: "text-red-500" },
-                { id: "F-G5SI007O", status: "Completed", color: "text-green-500" },
-              ].map((item, index) => (
+              {orders?.map((item) => (
                 <div 
-                  key={index} 
+                  key={item._id} 
                   className="flex justify-between items-center hover:bg-gray-50 p-2 rounded-lg transition-colors"
                 >
                   <div className="flex items-center space-x-2">
@@ -84,10 +142,10 @@ const DeliveryTracking = () => {
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">ID Number</p>
-                      <p className="font-bold">{item.id}</p>
+                      <p className="font-bold">{item.orderId}</p>
                     </div>
                   </div>
-                  <span className={`${item.color} font-medium`}>{item.status}</span>
+                  <span className={`capitalize ${item.status == "delivered" ? "text-green-500": (item.status == "pending" || "accepted" ? "text-yellow-500": "text-red-500")} font-medium`}>{item.status}</span>
                 </div>
               ))}
             </div>
@@ -95,6 +153,7 @@ const DeliveryTracking = () => {
         </div>
       </div>
     </div>
+    )
   );
 };
 
