@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useRef, useState } from "react";
 import { Bell, Plus, Package, Circle } from "lucide-react";
+import Link from "next/link";
 import { IUser, useAuth } from "@/context/AuthContext";
 import { Loader } from "../ui/custom/loader";
 import { getDate } from "@/lib/utils";
@@ -77,9 +78,9 @@ const DeliveryTracking = () => {
             <h1 className="text-2xl font-bold hidden lg:block">Delivery Dashboard</h1>
           </div>
           <div className="flex space-x-4">
-            <button className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors">
+            <Link href={'/user/order'} className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors">
               <Plus size={20} />
-            </button>
+            </Link>
             <button className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors relative">
               <Bell size={20} />
               <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
