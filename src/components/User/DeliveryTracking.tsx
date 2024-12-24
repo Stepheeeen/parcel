@@ -89,7 +89,7 @@ const DeliveryTracking = () => {
         <div className="flex justify-between items-center mt-4">
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
-              <Avatar className="h-15 w-15 bg-purple-100">
+              <Avatar className="h-[70px] w-[70px] bg-purple-100">
                 <AvatarImage
                   src={`https://api.dicebear.com/7.x/notionists/svg?seed=${
                     user?.username || "Username"
@@ -103,29 +103,26 @@ const DeliveryTracking = () => {
                 </AvatarFallback>
               </Avatar>
             </div>
-            <h1 className="text-2xl font-bold hidden lg:block">
-              Delivery Dashboard
+            <h1 className="text-2xl font-[500] hidden lg:block">
+              {user?.username}
             </h1>
           </div>
           <div className="flex space-x-4">
             <Link
               href={"/user/order"}
-              className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors"
+              className="px-6 py-3 bg-[#e8bc43] rounded-full flex items-center justify-center hover:bg-[#F9CA44] font-medium text-white transition-all"
             >
-              <Plus size={20} />
+              <p className="text-lg mr-1">Create Order</p>
+              <Plus size={25} />
             </Link>
-            <button className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors relative">
-              <Bell size={20} />
-              <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
           </div>
         </div>
 
         {/* Main content grid for larger screens */}
-        <div className="lg:grid lg:grid-cols-3 lg:gap-8 lg:mt-8">
+        <div className="lg:grid lg:grid-cols-3 lg:gap-8 lg:mt-14">
           {/* Ongoing Delivery Section */}
           <div className="lg:col-span-2">
-            <h2 className="text-xl font-bold mt-6 lg:mt-0">Newest Order</h2>
+            <h2 className="text-xl font-semibold mt-6 lg:mt-0">Newest Order</h2>
             {latestOrder?._id ? (
               <div className="bg-white rounded-xl shadow-md p-4 mt-2 lg:p-6">
                 <div className="flex justify-between">

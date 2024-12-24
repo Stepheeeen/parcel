@@ -4,7 +4,7 @@ import React from "react";
 
 const index = () => {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="h-full md:min-h-screen bg-gray-100 flex items-center md:justify-center">
       <Stepper />
     </div>
   );
