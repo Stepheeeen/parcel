@@ -1,6 +1,5 @@
 "use client";
-import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 export interface IVehicle {
@@ -68,16 +67,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   const router = useRouter();
+  const pathname = usePathname();
 
-//   const showToast = (
-//     description: string,
-//     variant: "default" | "destructive" = "default"
-//   ) => {
-//     toast({ description, variant });
-//   };
+  const AUTH_PAGES = ["/authentication/signin", "/authentication/signup", "/authentication/forget-password", "/authentication/create-password", "/authentication/verify"];
 
   useEffect(() => {
     const checkAuth = () => {
+      if (AUTH_PAGES.includes(pathname)) {
+        // Skip authentication check on auth pages
+        return;
+      }
+
       const data = localStorage.getItem("user_data");
       if (!data) {
         router.replace("/authentication/signin");
@@ -88,6 +88,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const parsedData = JSON.parse(data);
         if (!isValidUserData(parsedData))
           throw new Error("Invalid user data format");
+
         const { user, accessToken, refreshToken } = parsedData;
 
         setUser(user || null);
@@ -100,7 +101,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, pathname]);
 
   const login = (
     userData: IUser,
@@ -131,10 +132,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
     } catch (error: any) {
       console.error("Failed to log out:", error);
-    //   showToast(
-    //     error?.message || "An error occurred while logging out.",
-    //     "destructive"
-    //   );
     } finally {
       setUser(null);
       setAccessToken(undefined);
@@ -144,15 +141,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const value = { user, accessToken, refreshToken, login, logout, isAuthenticated: !!user };
+  const value = {
+    user,
+    accessToken,
+    refreshToken,
+    login,
+    logout,
+    isAuthenticated: !!user,
+  };
 
-  return (<AuthContext.Provider value={value}>{children}</AuthContext.Provider>);
-}
+  return (
+    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  );
+};
 
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within in an AuthProvider");
+    throw new Error("useAuth must be used within an AuthProvider");
   }
 
   return context;
