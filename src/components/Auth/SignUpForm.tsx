@@ -39,7 +39,6 @@ const SignUpForm = () => {
 
     e.preventDefault();
     try {
-
       const {email, password, username} = formData;
 
       const response = await fetch(`/api/users/register`, {
@@ -69,12 +68,12 @@ const SignUpForm = () => {
         <p className="mb-6 md:mb-3 mx-1">Fill in the fields, let’s get to know you.</p>
         <form className="flex flex-col gap-4 my-4">
           <InputField type="text" placeholder="Username" 
-            name="username"
+          name="username"
           value={formData.username}
           onChange={handleChange}/>
           <InputField type="email" placeholder="Email" 
-            name="email"
-              value={formData.email}
+          name="email"
+          value={formData.email}
           onChange={handleChange}
           />
           <InputField type="password" placeholder="Password" 
