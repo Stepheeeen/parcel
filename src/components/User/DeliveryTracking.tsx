@@ -115,7 +115,7 @@ const DeliveryTracking = () => {
                 </div>
               </div>
               <p className="text-gray-500 mt-2 lg:mt-4">
-                Rider's Name: <strong className="capitalize">Peter Kwankwanso</strong>
+                Rider's Name: <strong className="capitalize">{latestOrder?.rider.firstname + " " + latestOrder?.rider.lastname}</strong>
               </p>
             </div>
           </div>
