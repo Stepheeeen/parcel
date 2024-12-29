@@ -87,7 +87,7 @@ const DeliveryTracking = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mt-4">
-          <div className="flex items-center space-x-4">
+          <Link href={"user/profile"} className="flex items-center space-x-4">
             <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
               <Avatar className="h-[70px] w-[70px] bg-purple-100">
                 <AvatarImage
@@ -106,7 +106,7 @@ const DeliveryTracking = () => {
             <h1 className="text-2xl font-[500] hidden lg:block">
               {user?.username}
             </h1>
-          </div>
+          </Link>
           <div className="flex space-x-4">
             <Link
               href={"/user/order"}
