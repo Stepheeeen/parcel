@@ -68,8 +68,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const router = useRouter();
   const pathname = usePathname();
-
-  const AUTH_PAGES = ["/authentication/signin", "/authentication/signup", "/authentication/forget-password", "/authentication/create-password", "/authentication/verify"];
+  const AUTH_PAGES = ["/authentication/signin", "/authentication/signup/rider", "/authentication/signup", "/authentication/forget-password", "/authentication/create-password", "/authentication/verify", "/"];
 
   useEffect(() => {
     const checkAuth = () => {
