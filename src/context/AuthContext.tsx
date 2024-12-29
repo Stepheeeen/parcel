@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const AUTH_PAGES = ["/authentication/signin", "/authentication/signup/rider", "/authentication/signup", "/authentication/forget-password", "/authentication/create-password", "/authentication/verify", "/"];
 
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       if (AUTH_PAGES.includes(pathname)) {
         // Skip authentication check on auth pages
         return;
@@ -90,9 +90,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         const { user, accessToken, refreshToken } = parsedData;
 
-        setUser(user || null);
-        setAccessToken(accessToken || undefined);
-        setRefreshToken(refreshToken || undefined);
+        if(!accessToken) {
+          router.replace("/authentication/signin")
+        }else{
+          const response = await fetch("/api/users/session", {
+            method: "GET",
+            headers: {Authorization: `Bearer ${accessToken}`}
+          })
+
+          const session = await response.json();
+
+          if(response.ok){
+            setUser(session.user);
+             setAccessToken(session.accessToken);
+            setRefreshToken(session.refreshToken);
+          }else{
+            setUser(user || null);
+            setAccessToken(accessToken || undefined);
+            setRefreshToken(refreshToken || undefined);
+          }
+        }
+      
       } catch (error) {
         console.error("Failed to parse user_data:", error);
         router.replace("/authentication/signin");
