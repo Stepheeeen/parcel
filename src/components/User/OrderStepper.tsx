@@ -9,6 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { Parcel } from "@/interfaces/order.interface";
 
 const steps = [
   { id: 1, title: "Package Details" },
@@ -18,6 +21,12 @@ const steps = [
 ];
 
 const Stepper = () => {
+  const { accessToken } = useAuth();
+  const { toast } = useToast();
+
+  const [order, setOrder] = useState<Parcel | null>(null);
+
+  const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     packageName: "",
@@ -29,8 +38,88 @@ const Stepper = () => {
     toLocation: "",
   });
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < steps.length) setCurrentStep(currentStep + 1);
+
+   if(currentStep !== steps.length - 1){
+  // if(!formData.fromLocation || !formData.receiverPhone || !formData.toLocation || !formData.description || !formData.receiverName){
+      return
+   }else{
+    setLoading(true);
+
+    if(!formData.description) {
+      toast({
+        title: "Validation Error",
+        description: "Description is a required field",
+        variant: "destructive"
+      })
+      return;
+    }
+
+    if(!formData.fromLocation){
+      toast({
+        title: "Validation Error",
+        description: "Your location is required",
+        variant: "destructive"
+      })
+      return;
+    }
+
+    if(!formData.toLocation){
+      toast({
+        title: "Validation Error",
+        description: "Receiver's location is required",
+        variant: "destructive"
+      })
+      return;
+    }
+
+    if(!formData.receiverPhone){
+      toast({
+        title: "Validation Error",
+        description: "Receiver's phone is required",
+        variant: "destructive"
+      })
+    }
+    
+      try {
+        const response = await fetch("/api/orders/new", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            address: formData.fromLocation,
+            receiver: {
+              name: formData.receiverName,
+              phone: formData.receiverPhone,
+              address: formData.toLocation,
+            },
+            descr: formData.description,
+          })
+        })
+
+        const data = await response.json();
+
+        if(response.ok){
+          console.log(data);
+          setOrder(data);
+        }else{
+          toast({title: "Error", description: data.message || "Cannot complete order", variant: "destructive"})
+          return;
+        }
+      } catch (e:any) {
+        toast({
+          title: "Error",
+          description: e?.message ? e.message : e,
+          variant: "destructive"
+        })
+        return
+      }finally{
+        setLoading(false);
+      }
+   }
   };
 
   const handlePrevious = () => {
@@ -158,7 +247,7 @@ const Stepper = () => {
               <InputField
                 type="email"
                 name="receiverEmail"
-                placeholder="Receiver's Email"
+                placeholder="Receiver's Email (optional)"
                 value={formData.receiverEmail}
                 onChange={handleChange}
               />
