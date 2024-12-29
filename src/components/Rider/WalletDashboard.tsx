@@ -24,12 +24,12 @@ const DashboardHeader = ({ user }: { user: IUser | null }) => (
         <Avatar className="h-[70px] w-[70px] bg-purple-100">
           <AvatarImage
             src={`https://api.dicebear.com/7.x/notionists/svg?seed=${
-              user?.username || "Username"
+              user?.firstname || "Username"
             }`}
           />
           <AvatarFallback>
             {user
-              ? user.username.slice(0, 2).toUpperCase()
+              ? user.firstname?.slice(0, 2).toUpperCase()
               : "UN"}
           </AvatarFallback>
         </Avatar>
