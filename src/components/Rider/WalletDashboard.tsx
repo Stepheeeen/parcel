@@ -134,7 +134,7 @@ const TransactionItem = ({ transaction }: { transaction: ITransaction }) => (
             : "bg-yellow-50 text-yellow-600"
         }`}
       >
-        ${transaction.amount}
+        ₦{transaction.amount}
       </span>
     </div>
   </div>
