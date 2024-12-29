@@ -45,7 +45,11 @@ const VerificationForm = () => {
         // save token and user data
         localStorage.setItem("user_data", JSON.stringify(data))
         localStorage.removeItem("v-email-auth")
+        if(data.user.role === "rider" ){
+          router.replace("/rider/home");
+        }else{
         router.replace("/user/home");
+        }
       }else{
         toast({title: "Error", description: data.message, variant: "destructive"})
         return

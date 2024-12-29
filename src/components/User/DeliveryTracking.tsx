@@ -97,8 +97,8 @@ const DeliveryTracking = () => {
                 />
                 <AvatarFallback>
                   {user
-                    ? user?.username.charAt(0).toUpperCase() +
-                      user?.username.charAt(1).toUpperCase()
+                    ? user?.username.charAt(0).toUpperCase()  +
+                      user?.username.charAt(1).toUpperCase() 
                     : "UN"}
                 </AvatarFallback>
               </Avatar>

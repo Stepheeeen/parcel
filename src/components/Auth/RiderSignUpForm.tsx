@@ -13,7 +13,8 @@ const SignUpForm = () => {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    username: "",
+    firstname: "",
+    lastname: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -50,12 +51,12 @@ const SignUpForm = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { email, password, username } = formData;
+      const { email, password, firstname, lastname } = formData;
 
-      const response = await fetch(`/api/users/register`, {
+      const response = await fetch(`/api/riders/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, username }),
+        body: JSON.stringify({ email, password, firstname, lastname }),
       });
 
       if (response.status < 300 && response.status >= 200) {
@@ -93,9 +94,16 @@ const SignUpForm = () => {
         <form className="flex flex-col gap-4 w-full mt-7 space-y-2">
           <InputField
             type="text"
-            placeholder="Username"
-            name="username"
-            value={formData.username}
+            placeholder="Firstname"
+            name="firstname"
+            value={formData.firstname}
+            onChange={handleChange}
+          />
+           <InputField
+            type="text"
+            placeholder="Lastname"
+            name="lastname"
+            value={formData.lastname}
             onChange={handleChange}
           />
           <InputField
