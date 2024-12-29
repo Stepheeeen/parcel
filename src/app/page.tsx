@@ -138,7 +138,7 @@ const LandingPage = () => {
                 with Parcel.
               </p>
               <div className="mt-8 sm:mt-10 sm:flex sm:justify-center lg:justify-start space-x-4">
-                <Button className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all" onClick={()=> router.push("/authentication/signup/user")}>
+                <Button className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all" onClick={()=> router.push("/authentication/signup")}>
                   Create Account
                   <ChevronRight className="ml-2 h-5 w-5" />
                 </Button>
