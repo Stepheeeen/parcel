@@ -39,13 +39,7 @@ const DashboardHeader = ({ user }: { user: IUser | null }) => (
       </h1>
     </Link>
     
-    <Link
-      href="/user/deposit"
-      className="px-6 py-3 bg-[#e8bc43] rounded-full flex items-center justify-center hover:bg-[#F9CA44] hover:shadow-md font-medium text-white transition-all duration-300"
-    >
-      <span className="text-lg mr-2">Add Funds</span>
-      <Plus className="w-5 h-5" />
-    </Link>
+    
   </div>
 );
 
