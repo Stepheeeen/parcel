@@ -68,7 +68,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const router = useRouter();
   const pathname = usePathname();
-  const AUTH_PAGES = ["/authentication/signin", "/authentication/signup/rider", "/authentication/signup", "/authentication/forget-password", "/authentication/create-password", "/authentication/verify", "/"];
+  const AUTH_PAGES = [
+    "/authentication/signin",
+    "/authentication/signup/rider",
+    "/authentication/signup",
+    "/authentication/forget-password",
+    "/authentication/create-password",
+    "/authentication/verify",
+    "/",
+  ];
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -90,30 +98,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         const { user, accessToken, refreshToken } = parsedData;
 
-        if(!accessToken) {
-          router.replace("/authentication/signin")
-        }else{
-          const response = await fetch("/api/users/session", {
-            method: "GET",
-            headers: {Authorization: `Bearer ${accessToken}`}
-          })
-
-          const session = await response.json();
-
-          if(response.ok){
-            setUser(session.user);
-             setAccessToken(session.accessToken);
-            setRefreshToken(session.refreshToken);
-          }else{
-            setUser(user || null);
-            setAccessToken(accessToken || undefined);
-            setRefreshToken(refreshToken || undefined);
-          }
+        if (!accessToken) {
+          router.replace("/authentication/signin");
+          return;
         }
-      
+
+        // Validate session from the API
+        const response = await fetch("/api/users/session", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        const session = await response.json();
+
+        if (response.ok) {
+          if (session.tokenValid === false) {
+            console.warn("Token has expired. Redirecting to sign-in...");
+            logout();
+            return;
+          }
+
+          // Update user data from session
+          setUser(session.user || user);
+          setAccessToken(session.accessToken || accessToken);
+          setRefreshToken(session.refreshToken || refreshToken);
+        } else {
+          console.error("Failed to validate session. Logging out...");
+          logout();
+        }
       } catch (error) {
-        console.error("Failed to parse user_data:", error);
-        router.replace("/authentication/signin");
+        console.error("Error validating session:", error);
+        logout();
       }
     };
 
