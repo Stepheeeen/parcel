@@ -86,7 +86,13 @@ const ReceiptModal = ({
                 </div>
                 <div className="flex justify-between mb-4">
                   <span className="text-gray-600">Payment Status:</span>
-                  <span className="capitalize font-medium">
+                  <span
+                    className={`capitalize font-medium ${
+                      order.paymentStatus === "paid"
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
                     {order.paymentStatus}
                   </span>
                 </div>
@@ -117,7 +123,9 @@ const ReceiptModal = ({
                 <div className="flex justify-between">
                   <span className="text-gray-600">Name:</span>
                   <span className="font-medium capitalize">
-                    {`${order.rider?.firstname} ${order.rider?.lastname}`}
+                    {`${order.rider?.firstname || ""} ${
+                      order.rider?.lastname || "N/A"
+                    }`}
                   </span>
                 </div>
               </div>
@@ -126,7 +134,7 @@ const ReceiptModal = ({
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-medium">Total Cost</span>
                   <span className="text-xl font-bold text-[#F9CA44]">
-                  ₦{order.cost}
+                    ₦{order.cost}
                   </span>
                 </div>
               </div>
@@ -134,8 +142,18 @@ const ReceiptModal = ({
           )}
         </AlertDialogDescription>
       </AlertDialogHeader>
-      <AlertDialogFooter>
-        <AlertDialogCancel>Close</AlertDialogCancel>
+      <AlertDialogFooter className="flex items-center justify-between w-full">
+        {/* Checkout Button (visible only if paymentStatus is unpaid) */}
+        {order?.paymentStatus !== "paid" && (
+          <button className="bg-[#F9CA44] hover:bg-[#f0c143] text-white px-4 py-2 rounded-lg transition-colors">
+            Checkout Order
+          </button>
+        )}
+
+        {/* Close Button */}
+        <AlertDialogCancel className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+          Close
+        </AlertDialogCancel>
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
@@ -223,7 +241,7 @@ const LatestOrder = ({ order }: { order: IOrder | null }) => (
         <p className="text-gray-600 mt-4 lg:mt-6">
           Rider's Name:{" "}
           <span className="font-semibold capitalize">
-            {`${order.rider?.firstname} ${order.rider?.lastname}`}
+            {order.rider?.firstname || ""} {order.rider?.lastname || "N/A"}
           </span>
         </p>
       </div>
