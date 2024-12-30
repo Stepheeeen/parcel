@@ -12,6 +12,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Parcel } from "@/interfaces/order.interface";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -27,6 +28,8 @@ const Stepper = () => {
   const { accessToken } = useAuth();
   const { toast } = useToast();
 
+  const router = useRouter();
+
   const [order, setOrder] = useState<Parcel | null>(null);
 
   const [loading, setLoading] = useState(false);
@@ -40,6 +43,96 @@ const Stepper = () => {
     fromLocation: "",
     toLocation: "",
   });
+
+  const handleVerifyPayment = async () => {
+    try{
+      const reference = localStorage.getItem("v-reference") as string;
+
+      if(!reference) {
+        toast({
+          title: "Error",
+          description: "Cannot find reference, are you sure you placed an order?"
+        })
+        return;
+      }
+
+        const response = await fetch(`/api/orders/verify_payment?reference=${reference}`, {
+          method: "GET",
+          headers: {"Authorization": `Bearer ${accessToken}`},
+        })
+
+        const data = await response.json();
+
+        if(response.ok){
+          router.replace("/user/home")
+        }else{
+          toast({
+            title: "Error:",
+            description: data.message,
+            variant: "destructive",
+          })
+          return;
+        }
+
+      } catch (e: any) {
+        toast({
+          title: "Error",
+          description: e?.message ? e.message: e,
+          variant: "destructive"
+        })
+        return
+      }finally{
+        setLoading(false);
+      }
+  }
+
+
+  const handleCheckout = async () => {
+      if(!order) {
+        toast({
+          title: "Error",
+          description: "Complete order before you can checkout",
+          variant: "destructive"
+        })
+        return;
+      }
+
+      setLoading(true);
+      try {
+        
+        const response = await fetch(`/api/orders/checkout`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json", "Authorization": `Bearer ${accessToken}`},
+          body: JSON.stringify({
+            orderId: order.orderId,
+          })
+        })
+
+        const data = await response.json();
+
+        if(response.ok){
+          localStorage.setItem("v-reference", data.reference);
+          window.open(data.authorization_url, "_blank", "noopener,noreferrer")
+        }else{
+          toast({
+            title: "Error:",
+            description: "Cannot generate checkout ID",
+            variant: "destructive",
+          })
+          return;
+        }
+
+      } catch (e: any) {
+        toast({
+          title: "Error",
+          description: e?.message ? e.message: e,
+          variant: "destructive"
+        })
+        return
+      }finally{
+        setLoading(false);
+      }
+  }
 
   const handleNext = async () => {
     if (currentStep < steps.length) setCurrentStep(currentStep + 1);
@@ -106,7 +199,6 @@ const Stepper = () => {
         const data = await response.json();
 
         if (response.ok) {
-          console.log(data);
           setOrder(data);
         } else {
           toast({
@@ -422,31 +514,34 @@ const Stepper = () => {
           </div>
         </div>
 
-        {/* Navigation */}
-        <div className="flex justify-between items-center w-full pt-4 border-t">
-          <button
-            onClick={handlePrevious}
-            disabled={currentStep === 1}
-            className="px-6 py-2.5 flex items-center gap-2 rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Previous
-          </button>
+      {/* Navigation */}
+      <div className="flex justify-between items-center w-full pt-4 border-t">
+        <button
+          onClick={handlePrevious}
+          disabled={currentStep === 1}
+          className={`px-6 py-2.5 flex items-center gap-2 rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent transition-colors ${order?.cost ? "disabled": "active"}`}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Previous
+        </button>
 
-          <button
-            onClick={currentStep === steps.length ? undefined : handleNext}
-            className={`px-6 py-2.5 text-white rounded-lg flex items-center gap-2 transition-colors ${
-              currentStep === steps.length
-                ? "bg-green-500 hover:bg-green-600"
-                : "bg-[#F9CA44] hover:bg-[#f0c143]"
-            }`}
-          >
-            {currentStep === steps.length ? "Checkout Order" : "Next"}
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
+        <button
+          onClick={currentStep === steps.length ? undefined : handleNext}
+          className={`px-6 py-2.5 text-white rounded-lg items-center gap-2 transition-colors bg-[#F9CA44] hover:bg-[#f0c143]} ${currentStep !== steps.length ? "flex": "hidden"}`}
+        > Next
+          <ArrowRight className="w-4 h-4" />
+        </button>
+
+        <button
+          onClick={handleCheckout}
+          className={`px-6 py-2.5 text-white rounded-lg items-center gap-2 transition-colors bg-green-500 hover:bg-green-600 ${currentStep === steps.length ? "flex": "hidden"}`}
+        >
+          Checkout Order
+          <ArrowRight className="w-4 h-4" />
+        </button>
       </div>
     </div>
+    // </div>
   );
 };
 
