@@ -12,7 +12,6 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Parcel } from "@/interfaces/order.interface";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -24,7 +23,6 @@ const steps = [
 ];
 
 const Stepper = () => {
-  const router = useRouter()
   const { accessToken } = useAuth();
   const { toast } = useToast();
 
