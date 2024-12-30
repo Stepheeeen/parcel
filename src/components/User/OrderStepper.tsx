@@ -14,6 +14,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Parcel } from "@/interfaces/order.interface";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import PaystackBrowserModal from "../ui/custom/PaystackBrowserModal";
+import { Loader } from "../ui/custom/loader";
 
 const steps = [
   { id: 1, title: "Package Details" },
@@ -30,6 +32,11 @@ const Stepper = () => {
 
   const [order, setOrder] = useState<Parcel | null>(null);
 
+  const [reference, setReference] = useState<string | undefined>(undefined)
+  const [paymentUrl, setPaymentUrl] = useState<string | undefined>(undefined)
+
+  const [openModal, setOpenModal] = useState<boolean>(false);
+
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -44,8 +51,8 @@ const Stepper = () => {
 
   const handleVerifyPayment = async () => {
     try{
-      const reference = localStorage.getItem("v-reference") as string;
-
+      setLoading(true);
+      
       if(!reference) {
         toast({
           title: "Error",
@@ -84,6 +91,10 @@ const Stepper = () => {
       }
   }
 
+    const closeModal = async() => {
+      setOpenModal(false)
+      await handleVerifyPayment();
+  }
 
   const handleCheckout = async () => {
       if(!order) {
@@ -109,8 +120,12 @@ const Stepper = () => {
         const data = await response.json();
 
         if(response.ok){
-          localStorage.setItem("v-reference", data.reference);
-          window.open(data.authorization_url, "_blank", "noopener,noreferrer")
+         setReference(data.reference)
+         setPaymentUrl(data.authorization_url);
+          // window.open(data.authorization_url, "_blank", "noopener,noreferrer")
+          if(paymentUrl){
+          setOpenModal(true);
+          }
         }else{
           toast({
             title: "Error:",
@@ -232,7 +247,12 @@ const Stepper = () => {
 
   return (
     <div className="h-full md:min-h-screen w-full flex items-center md:justify-center">
-      <div className="w-full p-4 bg-white absolute top-0 left-0">
+    {
+      loading ? (
+        <Loader/>
+      ): (
+        <>
+            <div className="w-full p-4 bg-white absolute top-0 left-0">
         <div onClick={()=>{router.back()}} className="cursor-pointer">
         <ArrowLeft className="w-6 h-6 text-black"/>
         </div>
@@ -539,7 +559,11 @@ const Stepper = () => {
         </button>
       </div>
     </div>
-    // </div>
+        </>
+      )
+    }
+    {openModal && <PaystackBrowserModal isOpen={openModal} onClose={closeModal} paymentUrl={paymentUrl as string} key={reference}></PaystackBrowserModal>}
+     </div>
   );
 };
 

@@ -145,7 +145,7 @@ const ReceiptModal = ({
       <AlertDialogFooter className="flex items-center justify-between w-full">
         {/* Checkout Button (visible only if paymentStatus is unpaid) */}
         {order?.paymentStatus !== "paid" && (
-          <button className="bg-[#F9CA44] hover:bg-[#f0c143] text-white px-4 py-2 rounded-lg transition-colors">
+          <button className="bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded-lg transition-colors">
             Checkout Order
           </button>
         )}
@@ -322,7 +322,7 @@ const DeliveryTracking = () => {
 
         if (response.ok) {
           setOrders(data.docs);
-          setLatestOrder(data.docs[data.docs.length - 1]);
+          setLatestOrder(data.docs[0]);
           setHasMore(data.hasMore);
           setIsLoading(false);
         } else {
