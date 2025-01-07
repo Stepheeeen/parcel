@@ -1,4 +1,5 @@
 "use client";
+
 import { FcGoogle } from "react-icons/fc";
 import Button from "../ui/custom/button";
 import InputField from "../ui/InputField";
@@ -17,36 +18,28 @@ const SignInForm = () => {
     password: "",
   });
 
-  const handleChange = (e: any) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     const { email, password } = formData;
 
-    if (!email) {
+    if (!email || !password) {
       toast({
         title: "Validation Error",
-        description: "Email is a required field",
+        description: `${!email ? "Email" : "Password"} is a required field.`,
         variant: "destructive",
       });
       return;
     }
 
-    if (!password) {
-      toast({
-        title: "Validation Error",
-        description: "Password is a required field",
-        variant: "destructive",
-      });
-      return;
-    }
+    setLoading(true);
     try {
       const response = await fetch(`/api/users/signin`, {
         method: "POST",
@@ -58,23 +51,20 @@ const SignInForm = () => {
 
       if (response.ok) {
         localStorage.setItem("user_data", JSON.stringify(data));
-
         login(data.user, data.accessToken, data.refreshToken);
       } else {
         toast({
           title: "Error",
-          description: data.error,
+          description: data.error || "Login failed.",
           variant: "destructive",
         });
-        return;
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: e?.message ? e.message : e,
+        description: error?.message || "An unexpected error occurred.",
         variant: "destructive",
       });
-      return;
     } finally {
       setLoading(false);
     }
@@ -83,12 +73,13 @@ const SignInForm = () => {
   return (
     <>
       {loading && <Loader />}
-      <div className="p-6 py-10 md:py-6 bg-white rounded-md w-full md:max-w-md mx-auto h-auto shadow-none md:shadow-md">
-        <h2 className="text-3xl font-bold mb-1 mx-1 mt-10 md:mt-0">
-          Welcome Back
-        </h2>
-        <p className="mb-6 md:mb-3 mx-1">login into your account.</p>
-        <form className="flex flex-col gap-4 w-full mt-7 space-y-2">
+      <div className="p-6 py-10 md:py-6 bg-white rounded-md w-full md:max-w-md mx-auto md:shadow-md">
+        <h2 className="text-3xl font-bold mb-1">Welcome Back</h2>
+        <p className="mb-6">Login to your account.</p>
+        <form
+          className="flex flex-col gap-5 w-full mt-10 md:mt-7"
+          onSubmit={handleSubmit}
+        >
           <InputField
             type="email"
             placeholder="Email"
@@ -103,27 +94,31 @@ const SignInForm = () => {
             value={formData.password}
             onChange={handleChange}
           />
+          <div className="w-full">
+            <a
+              href="/authentication/forget-password"
+              className="text-md text-yellow-400 float-right my-2"
+            >
+              Forgot Password?
+            </a>
+          </div>
+          <div className="mb-[50px] md:mb-2" />
+
+          <Button label="Proceed" />
         </form>
-        <a
-          href="authentication/forget-password"
-          className="text-md text-yellow-400 float-right my-3 mb-10 md:mb-7"
-        >
-          Forgot Password?
-        </a>
-        <Button label="Proceed" onClick={handleSubmit} />
         <div className="text-center my-2 text-sm">Or</div>
         <Button
-        disabled={true}
+          disabled
           label={
             <div className="flex items-center justify-center gap-3">
-              <FcGoogle size={35} />
+              <FcGoogle size={20} />
               <p>Continue With Google</p>
             </div>
           }
           variant="secondary"
         />
         <p className="text-center text-sm mt-4">
-          Don't Have An Account?{" "}
+          Don’t have an account?{" "}
           <a href="/authentication/signup" className="text-yellow-400">
             Sign Up
           </a>

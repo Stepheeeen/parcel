@@ -85,7 +85,7 @@ const SignUpForm = () => {
   return (
     <>
       {loading && <Loader />}
-      <div className="p-6 py-10 md:py-6 bg-white rounded-md w-full md:max-w-md mx-auto shadow-md">
+      <div className="p-6 py-10 md:py-6 bg-white rounded-md w-full md:max-w-md mx-auto h-auto md:shadow-md">
         <h2 className="text-3xl font-bold mb-1">Let's Get Started</h2>
         <p className="mb-6">Fill in the fields to get started.</p>
         <form
@@ -141,6 +141,7 @@ const SignUpForm = () => {
               I Agree to the Terms and Conditions & Privacy Policy
             </p>
           </div>
+          <div className="mb-[50px] md:mb-2" />
           <Button label="Proceed" />
         </form>
         <div className="text-center my-2 text-sm">Or</div>
