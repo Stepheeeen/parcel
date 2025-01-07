@@ -73,7 +73,7 @@ const Stepper = () => {
         }else{
           toast({
             title: "Error:",
-            description: data.message,
+            description: data.error,
             variant: "destructive",
           })
           return;
@@ -216,7 +216,7 @@ const Stepper = () => {
         } else {
           toast({
             title: "Error",
-            description: data.message || "Cannot complete order",
+            description: data.error || "Cannot complete order",
             variant: "destructive",
           });
           return;

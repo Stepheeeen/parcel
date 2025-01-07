@@ -326,7 +326,7 @@ const DeliveryTracking = () => {
           setHasMore(data.hasMore);
           setIsLoading(false);
         } else {
-          console.error("Failed to fetch orders:", data.message);
+          console.error("Failed to fetch orders:", data.error);
           setIsLoading(false);
         }
       } catch (error) {

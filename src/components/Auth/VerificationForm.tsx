@@ -51,7 +51,7 @@ const VerificationForm = () => {
         router.replace("/user/home");
         }
       }else{
-        toast({title: "Error", description: data.message, variant: "destructive"})
+        toast({title: "Error", description: data.error, variant: "destructive"})
         return
       }
       } catch (error) {

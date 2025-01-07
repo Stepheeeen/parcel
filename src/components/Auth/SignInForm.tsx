@@ -63,7 +63,7 @@ const SignInForm = () => {
       } else {
         toast({
           title: "Error",
-          description: data.message,
+          description: data.error,
           variant: "destructive",
         });
         return;

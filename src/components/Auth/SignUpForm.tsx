@@ -20,7 +20,7 @@ const SignUpForm = () => {
     agreeToTerms: false,
   });
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -28,11 +28,13 @@ const SignUpForm = () => {
     }));
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!formData.agreeToTerms) {
       toast({
         title: "Validation Error",
-        description: "You have to agree to terms in order to proceed",
+        description: "You have to agree to terms to proceed",
         variant: "destructive",
       });
       return;
@@ -41,13 +43,12 @@ const SignUpForm = () => {
     if (formData.confirmPassword !== formData.password) {
       toast({
         title: "Validation Error",
-        description: "Password does not match",
+        description: "Passwords do not match",
         variant: "destructive",
       });
       return;
     }
 
-    e.preventDefault();
     setLoading(true);
     try {
       const { email, password, username } = formData;
@@ -58,25 +59,23 @@ const SignUpForm = () => {
         body: JSON.stringify({ email, password, username }),
       });
 
-      if (response.status < 300 && response.status >= 200) {
+      if (response.ok) {
         localStorage.setItem("v-email-auth", email);
         router.replace("/authentication/verify");
       } else {
         const data = await response.json();
         toast({
           title: "Error",
-          description: data.message,
+          description: data.error,
           variant: "destructive",
         });
-        return;
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: e?.message ? e.message : e,
+        description: "Something went wrong. Please try again later.",
         variant: "destructive",
       });
-      return;
     } finally {
       setLoading(false);
     }
@@ -85,12 +84,10 @@ const SignUpForm = () => {
   return (
     <>
       {loading && <Loader />}
-      <div className="p-6 py-10 md:py-6 bg-white rounded-md w-full md:max-w-md mx-auto h-auto shadow-none md:shadow-md">
-        <h2 className="text-3xl font-bold mb-1 mx-1">Let's Get Started</h2>
-        <p className="mb-6 md:mb-3 mx-1">
-          Fill in the fields, let’s get to know you.
-        </p>
-        <form className="flex flex-col gap-4 w-full mt-7 space-y-2">
+      <div className="p-6 py-10 md:py-6 bg-white rounded-md w-full md:max-w-md mx-auto h-auto shadow-md">
+        <h2 className="text-3xl font-bold mb-1">Let's Get Started</h2>
+        <p className="mb-6">Fill in the fields to get started.</p>
+        <form className="flex flex-col gap-4 w-full mt-7" onSubmit={handleSubmit}>
           <InputField
             type="text"
             placeholder="Username"
@@ -119,33 +116,32 @@ const SignUpForm = () => {
             value={formData.confirmPassword}
             onChange={handleChange}
           />
+          <div className="flex items-center gap-2 my-3">
+            <input
+              type="checkbox"
+              name="agreeToTerms"
+              checked={formData.agreeToTerms}
+              onChange={handleChange}
+            />
+            <p className="text-sm">
+              I agree to the Terms and Conditions & Privacy Policy
+            </p>
+          </div>
+          <Button label="Proceed" />
         </form>
-        <div className="flex items-center gap-2 my-3 mb-10 md:mb-7">
-          <input
-            type="checkbox"
-            className="cursor-pointer"
-            name="agreeToTerms"
-            checked={formData.agreeToTerms}
-            onChange={handleChange}
-          />
-          <p className="text-sm">
-            I Agree To The Terms And Conditions & Privacy Policy
-          </p>
-        </div>
-        <Button label="Proceed" onClick={handleSubmit} />
         <div className="text-center my-2 text-sm">Or</div>
         <Button
-        disabled={true}
+          disabled={true}
           label={
             <div className="flex items-center justify-center gap-3">
-              <FcGoogle size={35} />
-              <p>Continue With Google</p>
+              <FcGoogle size={20} />
+              <p>Continue with Google</p>
             </div>
           }
           variant="secondary"
         />
         <p className="text-center text-sm mt-4">
-          Already Have An Account?{" "}
+          Already have an account?{" "}
           <a href="/authentication/signin" className="text-yellow-400">
             Sign In
           </a>
