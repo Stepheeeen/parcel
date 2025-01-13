@@ -92,7 +92,7 @@ const SignUpForm = () => {
           className="flex flex-col gap-4 w-full mt-7"
           onSubmit={handleSubmit}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full">
             <InputField
               type="text"
               placeholder="Firstname"

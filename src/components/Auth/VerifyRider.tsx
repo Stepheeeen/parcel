@@ -1,6 +1,5 @@
-// pages/verification.tsx
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../ui/custom/button";
 import InputField from "../ui/InputField";
 import { Loader } from "../ui/custom/loader";
@@ -9,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 
 interface FormDataState {
   nin: string;
-  riderIdBase64: string;
+  id: string; // Changed from riderId to match API
   upload: File | null;
 }
 
@@ -19,7 +18,7 @@ export default function VerificationForm() {
   const router = useRouter();
   const [formData, setFormData] = useState<FormDataState>({
     nin: "",
-    riderIdBase64: "",
+    id: "", // Changed from riderId to match API
     upload: null,
   });
 
@@ -28,48 +27,35 @@ export default function VerificationForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      const base64 = await convertFileToBase64(file);
-      setFormData((prev) => ({
-        ...prev,
-        riderIdBase64: base64,
-      }));
-    }
-  };
-
-  const convertFileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const payload = {
-      nin: formData.nin,
-      riderIdBase64: formData.riderIdBase64,
-    };
 
     try {
+      const token = localStorage.getItem("access_token");
+
+      // Create FormData object to match API requirements
+      const formDataPayload = new FormData();
+      formDataPayload.append("nin", formData.nin);
+      formDataPayload.append("id", formData.id);
+      if (formData.upload) {
+        formDataPayload.append("upload", formData.upload);
+      }
+
       const response = await fetch("/api/verification/rider", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${token}`,
+          // Remove Content-Type header to let browser set it with boundary parameter
         },
-        body: JSON.stringify(payload),
+        body: formDataPayload,
       });
-      console.log(accessToken);
+
       if (response.ok) {
         const result = await response.json();
         console.log("Response:", result);
         router.replace("/authentication/signup/rider/verify-bike");
+        localStorage.removeItem("access_token");
       } else {
         console.error("Error submitting the form:", response.statusText);
       }
@@ -101,14 +87,12 @@ export default function VerificationForm() {
 
           {/* Rider ID */}
           <div>
-            <label className="block text-gray-700 text-sm md:text-base mb-2">
-              Upload Rider ID (Image or PDF)
-            </label>
             <InputField
-              placeholder="Upload Rider ID"
-              type="file"
-              name="riderId"
-              onChange={handleFileChange}
+              type="text"
+              placeholder="Enter your Rider ID"
+              name="id" // Changed from riderId to match API
+              value={formData.id} // Changed from riderId to match API
+              onChange={handleInputChange}
             />
           </div>
 
@@ -118,7 +102,7 @@ export default function VerificationForm() {
               Upload Supporting Document (Optional)
             </label>
             <InputField
-              placeholder="Upload Supporting Document"
+              placeholder="Upload Your Passport"
               type="file"
               name="upload"
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

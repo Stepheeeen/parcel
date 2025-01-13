@@ -70,7 +70,7 @@ const WalletCard = () => {
             <span className="text-lg font-medium text-gray-600">Available Balance</span>
           </div>
           
-          <div className="text-4xl font-bold mb-6">$1,250.00</div>
+          <div className="text-4xl font-bold mb-6">₦1,250.00</div>
           
           <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>

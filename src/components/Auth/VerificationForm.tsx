@@ -38,12 +38,14 @@ const VerificationForm = () => {
           },
           body: JSON.stringify({ otp: value, email }),
         });
+
         const data = await response.json();
-        // console.log(responseS);
+        // console.log(data);
 
         if (response.status < 300 && response.status >= 200) {
           // save token and user data
           localStorage.setItem("user_data", JSON.stringify(data));
+          localStorage.setItem("access_token", data.accessToken);
           localStorage.removeItem("v-email-auth");
           if (data.user.role === "rider") {
             router.replace("/authentication/signup/rider/verify");
