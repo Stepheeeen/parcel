@@ -73,8 +73,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     "/authentication/signup/rider",
     "/authentication/signup",
     "/authentication/forget-password",
+    "/authentication/forget-password/verify",
     "/authentication/create-password",
     "/authentication/verify",
+    "/authentication/signup/rider/verify",
+    "/authentication/signup/rider/verify-bike",
     "/",
   ];
 

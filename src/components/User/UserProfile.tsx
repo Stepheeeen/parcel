@@ -11,51 +11,54 @@ import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { Loader } from "../ui/custom/loader";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 const UserProfile = () => {
   const { user, logout } = useAuth();
-  const { toast } = useToast()
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const router = useRouter();
 
   useEffect(() => {
-    if(user){
+    if (user) {
       setIsLoading(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-  if (user) {
-    setIsLoading(false);
-  } else {
-    setIsLoading(true);
-  }
-}, [user]);
+    if (user) {
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+    }
+  }, [user]);
 
   const handleLogOut = async () => {
     setIsLoading(true);
     try {
-     logout();
-    } catch (e:any) {
+      logout();
+    } catch (e: any) {
       toast({
         title: "Error",
         description: e?.message ? e.message : e,
         variant: "destructive",
       });
       return;
-    }finally{
+    } finally {
       setIsLoading(false);
     }
-  }
+  };
 
-  return (
-    isLoading? (<Loader/>): (
-      <div className="min-h-screen bg-gray-50/50">
+  return isLoading ? (
+    <Loader />
+  ) : (
+    <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
       <div className="bg-white p-4 flex items-center justify-between border-b">
         <div className="flex items-center justify-between w-full gap-4">
-          <Link href={"/user/home"}>
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
+          <div onClick={() => router.back()}>
+            <ArrowLeft className="h-9 w-9" />
+          </div>
           <h1 className="text-xl font-[500]">User Profile</h1>
 
           <div></div>
@@ -67,8 +70,17 @@ const UserProfile = () => {
         <div className="flex justify-center mb-8 relative">
           <div className="relative">
             <Avatar className="h-24 w-24 bg-purple-100">
-              <AvatarImage src={`https://api.dicebear.com/7.x/notionists/svg?seed=${user?.username || user?.firstname || "Username"}`} />
-              <AvatarFallback>{user && user.role == "user" ? (user?.username.charAt(0).toUpperCase() + user?.username.charAt(1).toUpperCase()) :  "UN"}</AvatarFallback>
+              <AvatarImage
+                src={`https://api.dicebear.com/7.x/notionists/svg?seed=${
+                  user?.username || user?.firstname || "Username"
+                }`}
+              />
+              <AvatarFallback>
+                {user && user.role == "user"
+                  ? user?.username.charAt(0).toUpperCase() +
+                    user?.username.charAt(1).toUpperCase()
+                  : "UN"}
+              </AvatarFallback>
             </Avatar>
           </div>
         </div>
@@ -86,11 +98,25 @@ const UserProfile = () => {
               {/* <CardContent className="p-4 space-y-4"> */}
               <div>
                 {/* <label className="text-sm text-gray-500">Username</label> */}
-                <InputField placeholder={`${user?.username || "username"}`} type="text" />
+                <InputField
+                  placeholder=""
+                  disabled={true}
+                  value={`${
+                    user?.username ||
+                    `${user?.firstname} ${user?.lastname}` ||
+                    "John Doe"
+                  }`}
+                  type="text"
+                />
               </div>
               <div className="mb-9">
                 {/* <label className="text-sm text-gray-500">Email</label> */}
-                <InputField placeholder={`${user?.email || "parcel@gmail.com"}`} type="email" />
+                <InputField
+                  placeholder=""
+                  disabled={true}
+                  value={`${user?.email || "parcel@gmail.com"}`}
+                  type="email"
+                />
               </div>
 
               {/* </CardContent> */}
@@ -106,13 +132,12 @@ const UserProfile = () => {
 
           {/* Action Buttons */}
           <div className="space-y-4 pt-6 px-2 md:px-4">
-            <Button label={"Logout"} onClick={handleLogOut}/>
+            <Button label={"Logout"} onClick={handleLogOut} />
             <Button label={"Delete Account"} variant={"secondary"} />
           </div>
         </div>
       </div>
     </div>
-    )
   );
 };
 
