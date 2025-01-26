@@ -10,6 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { Loader } from "../ui/custom/loader";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { resolve } from "path";
 
 export default function RegisterVehicle() {
   const [loading, setLoading] = useState(false);
@@ -62,11 +63,20 @@ export default function RegisterVehicle() {
       } else {
         const errorData = await response.json();
         console.error("Error registering vehicle:", errorData);
-        toast({
-          title: "Error",
-          description: errorData.message || "Failed to register vehicle.",
-          variant: "destructive",
-        });
+        if (errorData.code === 401) {
+          toast({
+            title: "Error",
+            description: "User is unauthorized, please login again.",
+            variant: "destructive",
+          });
+          router.replace("/")
+        } else {
+          toast({
+            title: "Error",
+            description: errorData.message || "Failed to register vehicle.",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       console.error("Error:", error);

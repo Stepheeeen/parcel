@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Button from "../ui/custom/button";
 import InputField from "../ui/InputField";
 import { Loader } from "../ui/custom/loader";
@@ -8,7 +8,6 @@ import { useAuth } from "@/context/AuthContext";
 
 interface FormDataState {
   nin: string;
-  id: string; // Changed from riderId to match API
   upload: File | null;
 }
 
@@ -18,13 +17,21 @@ export default function VerificationForm() {
   const router = useRouter();
   const [formData, setFormData] = useState<FormDataState>({
     nin: "",
-    id: "", // Changed from riderId to match API
     upload: null,
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        upload: e.target.files[0],
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,7 +44,6 @@ export default function VerificationForm() {
       // Create FormData object to match API requirements
       const formDataPayload = new FormData();
       formDataPayload.append("nin", formData.nin);
-      formDataPayload.append("id", formData.id);
       if (formData.upload) {
         formDataPayload.append("upload", formData.upload);
       }
@@ -46,7 +52,6 @@ export default function VerificationForm() {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          // Remove Content-Type header to let browser set it with boundary parameter
         },
         body: formDataPayload,
       });
@@ -85,34 +90,17 @@ export default function VerificationForm() {
             />
           </div>
 
-          {/* Rider ID */}
-          <div>
-            <InputField
-              type="text"
-              placeholder="Enter your Rider ID"
-              name="id" // Changed from riderId to match API
-              value={formData.id} // Changed from riderId to match API
-              onChange={handleInputChange}
-            />
-          </div>
-
           {/* Supporting Document Upload */}
           <div>
             <label className="block text-gray-700 text-sm md:text-base mb-2">
               Upload Supporting Document (Optional)
             </label>
-            <InputField
-              placeholder="Upload Your Passport"
+            <input
               type="file"
               name="upload"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                if (e.target.files && e.target.files.length > 0) {
-                  setFormData((prev) => ({
-                    ...prev,
-                    upload: e.target.files[0],
-                  }));
-                }
-              }}
+              accept="image/*"
+              onChange={handleFileChange}
+              className="border rounded-lg p-2 w-full"
             />
           </div>
 

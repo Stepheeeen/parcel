@@ -6,7 +6,6 @@ import Link from "next/link";
 import { IUser, useAuth } from "@/context/AuthContext";
 import { Loader } from "../ui/custom/loader";
 import { getDate } from "@/lib/utils";
-import { useRouter } from "next/navigation";
 import { FaCircle } from "react-icons/fa";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
@@ -18,6 +17,9 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import PaystackBrowserModal from "../ui/custom/PaystackBrowserModal";
+import { toast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 // Types remain the same
 interface IOrder {
@@ -50,114 +52,234 @@ const ReceiptModal = ({
   order: IOrder | null;
   isOpen: boolean;
   onClose: () => void;
-}) => (
-  <AlertDialog open={isOpen} onOpenChange={onClose}>
-    <AlertDialogContent className="max-w-2xl">
-      <AlertDialogHeader>
-        <AlertDialogTitle className="flex items-center gap-2">
-          <Receipt className="w-5 h-5 text-[#F9CA44]" />
-          Order Receipt
-        </AlertDialogTitle>
-        <AlertDialogDescription>
-          {order && (
-            <div className="mt-4 space-y-4">
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <div className="flex justify-between mb-4">
-                  <span className="text-gray-600">Order ID:</span>
-                  <span className="font-medium">{order.orderId}</span>
-                </div>
-                <div className="flex justify-between mb-4">
-                  <span className="text-gray-600">Date:</span>
-                  <span className="font-medium">
-                    {getDate(new Date(order.createdAt))}
-                  </span>
-                </div>
-                <div className="flex justify-between mb-4">
-                  <span className="text-gray-600">Status:</span>
-                  <span
-                    className={`capitalize px-2 py-1 rounded-full text-sm font-medium ${
-                      order.status === "delivered"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
-                  >
-                    {order.status}
-                  </span>
-                </div>
-                <div className="flex justify-between mb-4">
-                  <span className="text-gray-600">Payment Status:</span>
-                  <span
-                    className={`capitalize font-medium ${
-                      order.paymentStatus === "paid"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
-                  >
-                    {order.paymentStatus}
-                  </span>
-                </div>
-              </div>
+}) => {
+  const router = useRouter();
+  const [reference, setReference] = useState<string | undefined>(undefined);
+  const [paymentUrl, setPaymentUrl] = useState<string | undefined>(undefined);
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
-              <div className="border-t pt-4">
-                <h4 className="font-medium mb-3">Delivery Details</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Receiver:</span>
-                    <span className="font-medium">{order.receiverName}</span>
+  const { accessToken } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const handleVerifyPayment = async () => {
+    try {
+      setLoading(true);
+
+      if (!reference) {
+        toast({
+          title: "Error",
+          description:
+            "Cannot find reference, are you sure you placed an order?",
+        });
+        return;
+      }
+
+      const response = await fetch(
+        `/api/orders/verify_payment?reference=${reference}`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        router.replace("/user/home");
+      } else {
+        toast({
+          title: "Error:",
+          description: data.error,
+          variant: "destructive",
+        });
+        return;
+      }
+    } catch (e: any) {
+      toast({
+        title: "Error",
+        description: e?.message ? e.message : e,
+        variant: "destructive",
+      });
+      return;
+    } finally {
+      setLoading(false);
+    }
+  };
+  const closeModal = async () => {
+    setOpenModal(false);
+    await handleVerifyPayment();
+  };
+  const handleCheckout = async () => {
+    onClose;
+    if (!order) {
+      toast({
+        title: "Error",
+        description: "Complete order before you can checkout",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/orders/checkout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          orderId: order.orderId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setReference(data.reference);
+        setPaymentUrl(data.authorization_url);
+        if (paymentUrl) {
+          setOpenModal(true);
+        }
+      } else {
+        toast({
+          title: "Error:",
+          description: "Cannot generate checkout ID",
+          variant: "destructive",
+        });
+        return;
+      }
+    } catch (e: any) {
+      toast({
+        title: "Error",
+        description: e?.message ? e.message : e,
+        variant: "destructive",
+      });
+      return;
+    } finally {
+      setLoading(false);
+    }
+  };
+  return (
+    <AlertDialog open={isOpen} onOpenChange={onClose}>
+      {loading && <Loader />}
+      <AlertDialogContent className="max-w-2xl">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center gap-2">
+            <Receipt className="w-5 h-5 text-[#F9CA44]" />
+            Order Receipt
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            {order && (
+              <div className="mt-4 space-y-4">
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <div className="flex justify-between mb-4">
+                    <span className="text-gray-600">Order ID:</span>
+                    <span className="font-medium">{order.orderId}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Phone:</span>
-                    <span className="font-medium">{order.receiverPhone}</span>
+                  <div className="flex justify-between mb-4">
+                    <span className="text-gray-600">Date:</span>
+                    <span className="font-medium">
+                      {getDate(new Date(order.createdAt))}
+                    </span>
                   </div>
+                  <div className="flex justify-between mb-4">
+                    <span className="text-gray-600">Status:</span>
+                    <span
+                      className={`capitalize px-2 py-1 rounded-full text-sm font-medium ${
+                        order.status === "delivered"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-700"
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+                  </div>
+                  <div className="flex justify-between mb-4">
+                    <span className="text-gray-600">Payment Status:</span>
+                    <span
+                      className={`capitalize font-medium ${
+                        order.paymentStatus === "paid"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {order.paymentStatus}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4">
+                  <h4 className="font-medium mb-3">Delivery Details</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Receiver:</span>
+                      <span className="font-medium">{order.receiverName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Phone:</span>
+                      <span className="font-medium">{order.receiverPhone}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Address:</span>
+                      <span className="font-medium text-right">
+                        {order.receiversAddress}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4">
+                  <h4 className="font-medium mb-3">Rider Information</h4>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Address:</span>
-                    <span className="font-medium text-right">
-                      {order.receiversAddress}
+                    <span className="text-gray-600">Name:</span>
+                    <span className="font-medium capitalize">
+                      {`${order.rider?.firstname || ""} ${
+                        order.rider?.lastname || "N/A"
+                      }`}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-medium">Total Cost</span>
+                    <span className="text-xl font-bold text-[#F9CA44]">
+                      ₦{order.cost}
                     </span>
                   </div>
                 </div>
               </div>
-
-              <div className="border-t pt-4">
-                <h4 className="font-medium mb-3">Rider Information</h4>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Name:</span>
-                  <span className="font-medium capitalize">
-                    {`${order.rider?.firstname || ""} ${
-                      order.rider?.lastname || "N/A"
-                    }`}
-                  </span>
-                </div>
-              </div>
-
-              <div className="border-t pt-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-medium">Total Cost</span>
-                  <span className="text-xl font-bold text-[#F9CA44]">
-                    ₦{order.cost}
-                  </span>
-                </div>
-              </div>
-            </div>
+            )}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="flex items-center justify-between w-full">
+          {/* Checkout Button (visible only if paymentStatus is unpaid) */}
+          {order?.paymentStatus !== "paid" && (
+            <button
+              className="bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded-lg transition-colors"
+              onClick={handleCheckout}
+            >
+              Checkout Order
+            </button>
           )}
-        </AlertDialogDescription>
-      </AlertDialogHeader>
-      <AlertDialogFooter className="flex items-center justify-between w-full">
-        {/* Checkout Button (visible only if paymentStatus is unpaid) */}
-        {order?.paymentStatus !== "paid" && (
-          <button className="bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded-lg transition-colors">
-            Checkout Order
-          </button>
-        )}
 
-        {/* Close Button */}
-        <AlertDialogCancel className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
-          Close
-        </AlertDialogCancel>
-      </AlertDialogFooter>
-    </AlertDialogContent>
-  </AlertDialog>
-);
+          {/* Close Button */}
+          <AlertDialogCancel className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+            Close
+          </AlertDialogCancel>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+      {openModal && (
+        <PaystackBrowserModal
+          isOpen={openModal}
+          onClose={closeModal}
+          paymentUrl={paymentUrl as string}
+          key={reference}
+        ></PaystackBrowserModal>
+      )}
+    </AlertDialog>
+  );
+};
 
 // Header Component
 const DashboardHeader = ({ user }: { user: IUser | null }) => (
@@ -326,7 +448,7 @@ const DeliveryTracking = () => {
           setHasMore(data.hasMore);
           setIsLoading(false);
         } else {
-          console.error("Failed to fetch orders:", data.error);
+          // console.error("Failed to fetch orders:", data.error);
           setIsLoading(false);
         }
       } catch (error) {
