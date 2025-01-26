@@ -20,8 +20,41 @@ const SignUpForm = () => {
     agreeToTerms: false,
   });
 
+  const [passwordCriteria, setPasswordCriteria] = useState({
+    minLength: false,
+    uppercase: false,
+    lowercase: false,
+    numeric: false,
+    specialChar: false,
+  });
+
+  const passwordRegex = {
+    minLength: /.{6,}/,
+    uppercase: /[A-Z]/,
+    lowercase: /[a-z]/,
+    numeric: /\d/,
+    specialChar: /[!@#$%^&*(),.?":{}|<>]/,
+  };
+
+  const validatePassword = (password: string) => {
+    const newCriteria = {
+      minLength: passwordRegex.minLength.test(password),
+      uppercase: passwordRegex.uppercase.test(password),
+      lowercase: passwordRegex.lowercase.test(password),
+      numeric: passwordRegex.numeric.test(password),
+      specialChar: passwordRegex.specialChar.test(password),
+    };
+
+    setPasswordCriteria(newCriteria);
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
+
+    if (name === "password") {
+      validatePassword(value);
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -44,6 +77,15 @@ const SignUpForm = () => {
       toast({
         title: "Validation Error",
         description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (Object.values(passwordCriteria).includes(false)) {
+      toast({
+        title: "Validation Error",
+        description: "Password does not meet the required criteria.",
         variant: "destructive",
       });
       return;
@@ -112,6 +154,55 @@ const SignUpForm = () => {
             value={formData.password}
             onChange={handleChange}
           />
+          {!Object.values(passwordCriteria).every(Boolean) && (
+            <div className="text-sm text-gray-600 mt-1">
+              <ul>
+                <li
+                  className={`${
+                    passwordCriteria.minLength
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  At least 6 characters
+                </li>
+                <li
+                  className={`${
+                    passwordCriteria.uppercase
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  At least one uppercase letter
+                </li>
+                <li
+                  className={`${
+                    passwordCriteria.lowercase
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  At least one lowercase letter
+                </li>
+                <li
+                  className={`${
+                    passwordCriteria.numeric ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  At least one numeric character
+                </li>
+                <li
+                  className={`${
+                    passwordCriteria.specialChar
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  At least one special character
+                </li>
+              </ul>
+            </div>
+          )}
           <InputField
             type="password"
             placeholder="Confirm Password"
@@ -131,7 +222,6 @@ const SignUpForm = () => {
             </p>
           </div>
           <div className="mb-[50px] md:mb-2" />
-
           <Button label="Proceed" />
         </form>
         <div className="text-center my-2 text-sm">Or</div>
