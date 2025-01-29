@@ -26,10 +26,11 @@ export default function VerificationForm() {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
+    const files = e.target.files;
+    if (files && files.length > 0) {
       setFormData((prev) => ({
         ...prev,
-        upload: e.target.files[0],
+        upload: files[0],
       }));
     }
   };
