@@ -166,6 +166,7 @@ const SignUpForm = () => {
             value={formData.password}
             onChange={handleChange}
           />
+
           {!Object.values(passwordCriteria).every(Boolean) && (
             <div className="text-sm text-gray-600 mt-1">
               <ul>
