@@ -111,7 +111,7 @@ const SignUpForm = () => {
         const data = await response.json();
         toast({
           title: "Error",
-          description: data.error || "Registration failed.",
+          description: data?.message,
           variant: "destructive",
         });
       }
