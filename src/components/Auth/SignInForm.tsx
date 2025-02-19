@@ -62,7 +62,7 @@ const SignInForm = () => {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error?.message || "An unexpected error occurred.",
+        description: error?.data?.message || "An unexpected error occurred.",
         variant: "destructive",
       });
     } finally {

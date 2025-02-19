@@ -14,7 +14,7 @@ import { resolve } from "path";
 
 export default function RegisterVehicle() {
   const [loading, setLoading] = useState(false);
-  const { accessToken } = useAuth();
+  // const { accessToken } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState({
     type: "",
@@ -49,11 +49,13 @@ export default function RegisterVehicle() {
     setLoading(true);
 
     try {
+      const token = localStorage.getItem("access_token");
+
       const response = await fetch("/api/riders/vehicle", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -62,14 +64,14 @@ export default function RegisterVehicle() {
         router.replace("/rider/home");
       } else {
         const errorData = await response.json();
-        console.error("Error registering vehicle:", errorData);
+        console.error(errorData);
         if (errorData.code === 401) {
           toast({
             title: "Error",
             description: "User is unauthorized, please login again.",
             variant: "destructive",
           });
-          router.replace("/")
+          router.replace("/");
         } else {
           toast({
             title: "Error",

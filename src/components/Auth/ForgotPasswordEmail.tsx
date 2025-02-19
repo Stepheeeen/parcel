@@ -58,14 +58,14 @@ const ForgetPasswordEmail = () => {
       } else {
         toast({
           title: "Error",
-          description: data.message || "Something went wrong.",
+          description: data?.message,
           variant: "destructive",
         });
       }
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error?.message || "An unexpected error occurred.",
+        description: error?.data?.message,
         variant: "destructive",
       });
     } finally {

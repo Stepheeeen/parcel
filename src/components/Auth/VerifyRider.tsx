@@ -61,7 +61,7 @@ export default function VerificationForm() {
         const result = await response.json();
         console.log("Response:", result);
         router.replace("/authentication/signup/rider/verify-bike");
-        localStorage.removeItem("access_token");
+        // localStorage.removeItem("access_token");
       } else {
         console.error("Error submitting the form:", response.statusText);
       }
