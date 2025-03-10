@@ -61,7 +61,6 @@ const WalletCard = ({ user }: { user: IUser | null }) => {
 
   return (
     <div className="lg:col-span-2">
-      <h2 className="text-xl font-semibold mt-6 lg:mt-0">Wallet Balance</h2>
       <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 mt-2 relative overflow-hidden">
         {/* Decorative Pattern */}
         <div className="absolute top-0 right-0 w-64 h-64 transform translate-x-32 -translate-y-32">
