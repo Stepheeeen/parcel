@@ -3,7 +3,7 @@ import React from "react";
 
 const index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="h-[80vh] md:min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
       <VerificationForm />
     </div>
   );
