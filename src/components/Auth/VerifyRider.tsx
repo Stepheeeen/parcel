@@ -94,7 +94,7 @@ export default function VerificationForm() {
           {/* Supporting Document Upload */}
           <div>
             <label className="block text-gray-700 text-sm md:text-base mb-2">
-              Upload Supporting Document (Optional)
+              Upload Supporting Document
             </label>
             <input
               type="file"

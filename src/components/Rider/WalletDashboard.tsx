@@ -4,7 +4,17 @@ import React, { useState } from "react";
 import { Wallet, ArrowDownCircle, Plus } from "lucide-react";
 import Link from "next/link";
 import { IUser, useAuth } from "@/context/AuthContext";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 // Types
@@ -20,7 +30,7 @@ interface ITransaction {
 const DashboardHeader = ({ user }: { user: IUser | null }) => (
   <div className="flex justify-between items-center mt-4">
     <Link href="profile" className="group flex items-center space-x-4">
-      <div className="relative overflow-hidden rounded-full transition-transform group-hover:scale-105">
+      <div className="relative overflow-hidden flex items-center gap-3 transition-transform group-hover:scale-105">
         <Avatar className="h-[70px] w-[70px] bg-purple-100">
           <AvatarImage
             src={`https://api.dicebear.com/7.x/notionists/svg?seed=${
@@ -28,29 +38,25 @@ const DashboardHeader = ({ user }: { user: IUser | null }) => (
             }`}
           />
           <AvatarFallback>
-            {user
-              ? user.firstname?.slice(0, 2).toUpperCase()
-              : "UN"}
+            {user ? user.firstname?.slice(0, 2).toUpperCase() : "UN"}
           </AvatarFallback>
         </Avatar>
+        <h1 className="text-xl md:text-2xl font-medium block group-hover:text-gray-700">
+          <p className="text-base">username</p>@{user?.firstname}
+        </h1>
       </div>
-      <h1 className="text-2xl font-medium hidden lg:block group-hover:text-gray-700">
-        {user?.username}
-      </h1>
     </Link>
-    
-    
   </div>
 );
 
 // Wallet Card Component
-const WalletCard = () => {
+const WalletCard = ({ user }: { user: IUser | null }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [withdrawAmount, setWithdrawAmount] = useState("");
 
   const handleWithdraw = () => {
     setIsOpen(false);
-    setWithdrawAmount('');
+    setWithdrawAmount("");
   };
 
   return (
@@ -61,17 +67,19 @@ const WalletCard = () => {
         <div className="absolute top-0 right-0 w-64 h-64 transform translate-x-32 -translate-y-32">
           <div className="absolute inset-0 bg-[#F9CA44] opacity-10 transform rotate-45 scale-150" />
         </div>
-        
+
         <div className="relative z-10">
           <div className="flex items-center space-x-3 mb-6">
             <div className="p-3 bg-[#F9CA44] bg-opacity-20 rounded-full">
               <Wallet className="w-8 h-8 text-[#F9CA44]" />
             </div>
-            <span className="text-lg font-medium text-gray-600">Available Balance</span>
+            <span className="text-lg font-medium text-gray-600">
+              Available Balance
+            </span>
           </div>
-          
-          <div className="text-4xl font-bold mb-6">₦1,250.00</div>
-          
+
+          <div className="text-4xl font-bold mb-6">₦ {user?.balance || 0}</div>
+
           <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
               <button className="flex items-center gap-2 bg-[#F9CA44] text-white px-6 py-3 rounded-lg hover:bg-[#e0b63c] transition-all duration-300">
@@ -143,32 +151,42 @@ const TransactionItem = ({ transaction }: { transaction: ITransaction }) => (
 // Main Component
 const WalletDashboard = () => {
   const { user } = useAuth();
-  const transactions: ITransaction[] = [
-    { id: "TR001", type: "withdrawal", amount: 150, status: "completed", date: "2024-12-28" },
-    { id: "TR002", type: "deposit", amount: 300, status: "pending", date: "2024-12-27" },
-    { id: "TR003", type: "withdrawal", amount: 200, status: "completed", date: "2024-12-26" },
-  ];
+  const transactions: ITransaction[] = [];
 
   return (
     <div className="bg-gray-50 min-h-screen p-4 lg:p-8">
       <div className="max-w-7xl mx-auto">
         <DashboardHeader user={user} />
-        
+
         <div className="lg:grid lg:grid-cols-3 lg:gap-8 lg:mt-14">
-          <WalletCard />
-          
+          <WalletCard user={user} />
+
           <div>
             <div className="flex justify-between items-center mt-6 lg:mt-0">
               <h2 className="text-xl font-bold">Recent Transactions</h2>
-              <Link href="#" className="text-gray-500 hover:text-gray-700 hover:underline transition-colors">
+              <Link
+                href="#"
+                className="text-gray-500 hover:text-gray-700 hover:underline transition-colors"
+              >
                 See All
               </Link>
             </div>
-            
+
             <div className="space-y-3">
-              {transactions.map((transaction) => (
-                <TransactionItem key={transaction.id} transaction={transaction} />
-              ))}
+              {transactions.length === 0 ? (
+                <div className="grid place-items-center w-full h-48">
+                  <p className="text-gray-500 text-sm">
+                    No recent transactions
+                  </p>
+                </div>
+              ) : (
+                transactions.map((transaction: ITransaction) => (
+                  <TransactionItem
+                    key={transaction.id}
+                    transaction={transaction}
+                  />
+                ))
+              )}
             </div>
           </div>
         </div>

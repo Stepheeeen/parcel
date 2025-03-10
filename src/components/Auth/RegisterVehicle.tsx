@@ -95,7 +95,7 @@ export default function RegisterVehicle() {
   return (
     <div className="min-h-screen flex pt-[20%] md:pt-4 md:items-center justify-center md:p-4">
       {loading && <Loader />}
-      <Card className="w-full max-w-lg shadow-none md:shadow-lg ">
+      <Card className="w-full max-w-lg shadow-none md:shadow-lg border-none">
         <CardHeader>
           <CardTitle className="text-2xl font-semibold text-gray-800">
             Register Vehicle
