@@ -1,20 +1,50 @@
 "use client";
 
-import React, { useState } from "react";
-import { Wallet, ArrowDownCircle, Plus } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { Wallet, ArrowDownCircle, Plus, Receipt, Package } from "lucide-react";
 import Link from "next/link";
 import { IUser, useAuth } from "@/context/AuthContext";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { getDate } from "@/lib/utils";
 
-// Types
-interface ITransaction {
-  id: string;
-  type: string;
-  amount: number;
+
+interface IOrder {
+  _id: string;
+  orderId: string;
+  receiverPhone: string;
+  receiverName: string;
+  receiversAddress: string;
+  descr: string;
+  sender: IUser;
   status: string;
-  date: string;
+  paymentStatus: string;
+  receiver?: IUser;
+  timeOfArrival?: Date;
+  cost: string;
+  address: string;
+  rider: IUser;
+  gatewayPaymentId?: string;
+  externalReference?: string;
+  authorizationCode?: string;
+  updatedAt: Date;
+  createdAt: Date;
 }
+
+interface IWallet {
+  balance: number;
+  updatedAt: Date;
+  createdAt: Date;
+  rider: any;
+}
+
+interface IWalletAndTransactions {
+  orders: IOrder[];
+  completedOrders: number;
+  notDeliveredOrders: number;
+  wallet: IWallet
+}
+
 
 // Header Component
 const DashboardHeader = ({ user }: { user: IUser | null }) => (
@@ -44,10 +74,10 @@ const DashboardHeader = ({ user }: { user: IUser | null }) => (
 );
 
 // Wallet Card Component
-const WalletCard = () => {
+const WalletCard = ({balance, notDeliveredOrders, completedOrders}: {balance:  number, notDeliveredOrders: number, completedOrders: number}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState('');
-
+ 
   const handleWithdraw = () => {
     setIsOpen(false);
     setWithdrawAmount('');
@@ -55,7 +85,7 @@ const WalletCard = () => {
 
   return (
     <div className="lg:col-span-2">
-      <h2 className="text-xl font-semibold mt-6 lg:mt-0">Wallet Balance</h2>
+      <h2 className="text-xl font-semibold mt-6 lg:mt-0"></h2>
       <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 mt-2 relative overflow-hidden">
         {/* Decorative Pattern */}
         <div className="absolute top-0 right-0 w-64 h-64 transform translate-x-32 -translate-y-32">
@@ -70,7 +100,7 @@ const WalletCard = () => {
             <span className="text-lg font-medium text-gray-600">Available Balance</span>
           </div>
           
-          <div className="text-4xl font-bold mb-6">$1,250.00</div>
+          <div className="text-4xl font-bold mb-6">NGN {new Intl.NumberFormat().format(balance)}</div>
           
           <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
@@ -110,44 +140,211 @@ const WalletCard = () => {
           </AlertDialog>
         </div>
       </div>
+      <div className="flex flex-row justify-start gap-4 py-6 px-1">
+        <span className="block font-semibold">
+        Completed Deliveries: <span className="font-normal">{completedOrders}</span>
+        </span>
+          <span className="block font-semibold">
+          Pending Deliveries: <span className="font-normal">{notDeliveredOrders}</span>
+        </span>
+      </div>
     </div>
   );
 };
 
+const ReceiptModal = ({
+  order,
+  isOpen,
+  onClose,
+}: {
+  order: IOrder | null;
+  isOpen: boolean;
+  onClose: () => void;
+}) => (
+  <AlertDialog open={isOpen} onOpenChange={onClose}>
+    <AlertDialogContent className="max-w-2xl">
+      <AlertDialogHeader>
+        <AlertDialogTitle className="flex items-center gap-2">
+          <Receipt className="w-5 h-5 text-[#F9CA44]" />
+          Order Receipt
+        </AlertDialogTitle>
+        <AlertDialogDescription>
+          {order && (
+            <div className="mt-4 space-y-4">
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <div className="flex justify-between mb-4">
+                  <span className="text-gray-600">Order ID:</span>
+                  <span className="font-medium">{order.orderId}</span>
+                </div>
+                <div className="flex justify-between mb-4">
+                  <span className="text-gray-600">Date:</span>
+                  <span className="font-medium">
+                    {getDate(new Date(order.updatedAt))}
+                  </span>
+                </div>
+                <div className="flex justify-between mb-4">
+                  <span className="text-gray-600">Status:</span>
+                  <span
+                    className={`capitalize px-2 py-1 rounded-full text-sm font-medium ${
+                      order.status === "delivered"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {order.status}
+                  </span>
+                </div>
+                <div className="flex justify-between mb-4">
+                  <span className="text-gray-600">Payment Status:</span>
+                  <span
+                    className={`capitalize font-medium ${
+                      order.paymentStatus === "paid"
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {order.paymentStatus}
+                  </span>
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <h4 className="font-medium mb-3">Delivery Details</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Receiver:</span>
+                    <span className="font-medium">{order.receiverName}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Address:</span>
+                    <span className="font-medium text-right">
+                      {order.receiversAddress}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-medium">Total Cost</span>
+                  <span className="text-xl font-bold text-black">
+                    ₦{new Intl.NumberFormat().format(parseInt(order.cost))}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter className="flex items-center justify-between w-full">
+        {/* Checkout Button (visible only if paymentStatus is unpaid) */}
+        {order?.paymentStatus !== "paid" && (
+          <button className="bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded-lg transition-colors">
+            Checkout Order
+          </button>
+        )}
+
+        {/* Close Button */}
+        <AlertDialogCancel className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+          Close
+        </AlertDialogCancel>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
+);
+
+
 // Transaction Item Component
-const TransactionItem = ({ transaction }: { transaction: ITransaction }) => (
-  <div className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-4 lg:p-6 mt-2">
+const TransactionItem = ({ order, onClick }: { order: IOrder, 
+  onClick: () => void
+ }) => {
+
+  return (
+      <div className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-4 lg:p-6 mt-2 cursor-pointer" onClick={onClick}>
     <div className="flex justify-between items-center">
       <div className="flex items-center space-x-3">
         <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-gray-100 transition-colors">
-          <Wallet className="w-7 h-7 text-gray-600" />
+          <Package className="w-7 h-7 text-gray-600" />
         </div>
         <div>
           <p className="text-sm text-gray-500">Transaction ID</p>
-          <p className="font-bold">#{transaction.id}</p>
+          <p className="font-bold">#{order.orderId}</p>
         </div>
       </div>
       <span
         className={`capitalize font-medium px-3 py-1 rounded-full text-sm ${
-          transaction.status === "completed"
+          order.status === "delivered"
             ? "bg-green-50 text-green-600"
             : "bg-yellow-50 text-yellow-600"
         }`}
       >
-        ₦{transaction.amount}
+        
+        ₦ {new Intl.NumberFormat().format(parseInt(order.cost))}
       </span>
     </div>
   </div>
-);
+  )
+};
 
 // Main Component
 const WalletDashboard = () => {
-  const { user } = useAuth();
-  const transactions: ITransaction[] = [
-    { id: "TR001", type: "withdrawal", amount: 150, status: "completed", date: "2024-12-28" },
-    { id: "TR002", type: "deposit", amount: 300, status: "pending", date: "2024-12-27" },
-    { id: "TR003", type: "withdrawal", amount: 200, status: "completed", date: "2024-12-26" },
-  ];
+   const {user, accessToken} = useAuth();
+  const [wallet, setWallet] = useState<IWallet | null>(null);
+  const [orders, setOrders] = useState<IOrder[] | null>(null)
+   const [hasMore, setHasMore] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+      const [latestOrder, setLatestOrder] = useState<IOrder | null>(null);
+      const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null);
+      const [isModalOpen, setIsModalOpen] = useState(false);
+      const [completedOrders, setCompletedOrders] = useState(0);
+      const [notDeliveredOrders, setNotDeliveredOrders] = useState(0);
+
+      const page = useRef(1);
+      const limit = useRef(10);
+
+        const handleOrderClick = (order: IOrder) => {
+          setSelectedOrder(order);
+          setIsModalOpen(true);
+      };
+
+    
+      useEffect(() => {
+          const fetchOrders = async () => {
+            if (!hasMore) return;
+      
+            try {
+              const response = await fetch(
+                `/api/wallets?page=${page.current}&limit=${limit.current}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                  },
+                }
+              );
+      
+              const data = await response.json();
+      
+              if (response.ok) {
+                setWallet(data.wallet)
+                setOrders(data.orders.docs)
+                setLatestOrder(data.orders.docs[0]);
+                setHasMore(data.orders.hasMore);
+                setCompletedOrders(data.completedOrders);
+                setNotDeliveredOrders(data.notDeliveredOrders)
+                setIsLoading(false);
+              } else {
+                console.error("Failed to fetch orders:", data.message);
+                setIsLoading(false);
+              }
+            } catch (error) {
+              console.error("Error fetching orders:", error);
+              setIsLoading(false);
+            }
+          };
+      
+          fetchOrders();
+        }, [accessToken, hasMore]);
+
 
   return (
     <div className="bg-gray-50 min-h-screen p-4 lg:p-8">
@@ -155,23 +352,28 @@ const WalletDashboard = () => {
         <DashboardHeader user={user} />
         
         <div className="lg:grid lg:grid-cols-3 lg:gap-8 lg:mt-14">
-          <WalletCard />
+          <WalletCard balance = {wallet?.balance || 0} completedOrders= {completedOrders} notDeliveredOrders=  {notDeliveredOrders}/>
           
           <div>
             <div className="flex justify-between items-center mt-6 lg:mt-0">
-              <h2 className="text-xl font-bold">Recent Transactions</h2>
+              <h2 className="text-xl font-bold">Recent Orders</h2>
               <Link href="#" className="text-gray-500 hover:text-gray-700 hover:underline transition-colors">
                 See All
               </Link>
             </div>
             
             <div className="space-y-3">
-              {transactions.map((transaction) => (
-                <TransactionItem key={transaction.id} transaction={transaction} />
+              {orders?.map((order: IOrder) => (
+                <TransactionItem key={order._id} order={order} onClick={() => handleOrderClick(order)}/>
               ))}
             </div>
           </div>
         </div>
+        <ReceiptModal
+          order={selectedOrder}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
       </div>
     </div>
   );

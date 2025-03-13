@@ -133,8 +133,8 @@ const ReceiptModal = ({
               <div className="border-t pt-4">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-medium">Total Cost</span>
-                  <span className="text-xl font-bold text-[#F9CA44]">
-                    ₦{order.cost}
+                  <span className="text-xl font-bold text-black">
+                    ₦{new Intl.NumberFormat().format(parseInt(order.cost))}
                   </span>
                 </div>
               </div>

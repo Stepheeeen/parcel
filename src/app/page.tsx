@@ -133,7 +133,7 @@ const LandingPage = () => {
                 <span className="block text-yellow-500">Delivery Service</span>
               </h1>
               <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                Send packages across the country with real-time tracking and
+                Send packages within Lokoja city with real-time tracking and
                 guaranteed delivery times. Experience the future of logistics
                 with Parcel.
               </p>
