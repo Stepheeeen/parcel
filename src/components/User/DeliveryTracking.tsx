@@ -240,28 +240,25 @@ const ReceiptModal = ({
                   </div>
                 </div>
 
-                <div className="border-t pt-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-medium">Total Cost</span>
-                    <span className="text-xl font-bold text-[#F9CA44]">
-                      ₦{order.cost}
-                    </span>
-                  </div>
+              <div className="border-t pt-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-medium">Total Cost</span>
+                  <span className="text-xl font-bold text-black">
+                    ₦{new Intl.NumberFormat().format(parseInt(order.cost))}
+                  </span>
                 </div>
               </div>
-            )}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter className="flex items-center justify-between w-full">
-          {/* Checkout Button (visible only if paymentStatus is unpaid) */}
-          {order?.paymentStatus !== "paid" && (
-            <button
-              className="bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded-lg transition-colors"
-              onClick={handleCheckout}
-            >
-              Checkout Order
-            </button>
+            </div>
           )}
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter className="flex items-center justify-between w-full">
+        {/* Checkout Button (visible only if paymentStatus is unpaid) */}
+        {order?.paymentStatus !== "paid" && (
+          <button className="bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded-lg transition-colors">
+            Checkout Order
+          </button>
+        )}
 
           {/* Close Button */}
           <AlertDialogCancel className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">

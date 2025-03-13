@@ -39,6 +39,7 @@ const Stepper = () => {
 
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+
   const [formData, setFormData] = useState({
     packageName: "",
     description: "",
@@ -99,57 +100,58 @@ const Stepper = () => {
     await handleVerifyPayment();
   };
 
-  const handleCheckout = async () => {
-    if (!order) {
-      toast({
-        title: "Error",
-        description: "Complete order before you can checkout",
-        variant: "destructive",
-      });
-      return;
-    }
+ const handleCheckout = async () => {
+  if (!order) {
+    toast({
+      title: "Error",
+      description: "Complete order before you can checkout",
+      variant: "destructive",
+    });
+    return;
+  }
 
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/orders/checkout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          orderId: order.orderId,
-        }),
-      });
+  setLoading(true);
+  try {
+    const response = await fetch(`/api/orders/checkout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        orderId: order.orderId,
+      }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.ok) {
-        setReference(data.reference);
-        setPaymentUrl(data.authorization_url);
-        // window.open(data.authorization_url, "_blank", "noopener,noreferrer")
-        if (paymentUrl) {
-          setOpenModal(true);
-        }
-      } else {
-        toast({
-          title: "Error:",
-          description: "Cannot generate checkout ID",
-          variant: "destructive",
-        });
-        return;
+    if (response.ok) {
+      setReference(data.reference);
+      setPaymentUrl(data.authorization_url);
+
+      // Instead of checking paymentUrl, use the response data directly
+      if (data.authorization_url) {
+        setOpenModal(true);
       }
-    } catch (e: any) {
+    } else {
       toast({
-        title: "Error",
-        description: e?.message ? e.message : e,
+        title: "Error:",
+        description: "Cannot generate checkout ID",
         variant: "destructive",
       });
       return;
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (e: any) {
+    toast({
+      title: "Error",
+      description: e?.message ? e.message : e,
+      variant: "destructive",
+    });
+    return;
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleNext = async () => {
     if (currentStep < steps.length) setCurrentStep(currentStep + 1);
@@ -248,6 +250,23 @@ const Stepper = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
+  const supportedLocations = [
+    "Adankolo FUL Street",
+    "Ganaja",
+    "Crusher",
+    "GRA",
+    "Zone 8",
+    "Kpata",
+    "Cantonment",
+    "Adankolo",
+    "Zango",
+    "Felele GT",
+    "Felele Unique Hotel",
+    "Felele",
+    "Lokongoma",
+    "Phase II",
+  ]
 
   return (
     <div className="h-full md:min-h-screen w-full flex items-center md:justify-center">
@@ -418,69 +437,51 @@ const Stepper = () => {
                 </div>
               </div>
 
-              <div
-                className={`transition-all duration-300 ${
-                  currentStep === 3 ? "block" : "hidden"
-                }`}
+          <div
+            className={`transition-all duration-300 ${
+              currentStep === 3 ? "block" : "hidden"
+            }`}
+          >
+            <div className="space-y-5">
+              <Select
+                onValueChange={(value) =>
+                  handleChange({
+                    target: { name: "fromLocation", value },
+                  } as any)
+                }
               >
-                <div className="space-y-5">
-                  <Select
-                    onValueChange={(value) =>
-                      handleChange({
-                        target: { name: "fromLocation", value },
-                      } as any)
-                    }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="From Location" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {/* Location options */}
-                      {[
-                        "Adankolo",
-                        "Ganaja",
-                        "Crusher",
-                        "GRA",
-                        "Zone 8",
-                        "Lokongoma",
-                        "Felele"
-                      ].map((location) => (
-                        <SelectItem key={location} value={location}>
-                          {location}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="From Location" />
+                </SelectTrigger>
+                <SelectContent>
+                  {/* Location options */}
+                  {supportedLocations.map((location) => (
+                    <SelectItem key={location} value={location}>
+                      {location}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-                  <Select
-                    onValueChange={(value) =>
-                      handleChange({
-                        target: { name: "toLocation", value },
-                      } as any)
-                    }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="To Location" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {/* Location options */}
-                      {[
-                        "Adankolo",
-                        "Ganaja",
-                        "Crusher",
-                        "GRA",
-                        "Zone 8",
-                        "Lokongoma",
-                        "Felele"
-                      ].map((location) => (
-                        <SelectItem key={location} value={location}>
-                          {location}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+              <Select
+                onValueChange={(value) =>
+                  handleChange({ target: { name: "toLocation", value } } as any)
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="To Location" />
+                </SelectTrigger>
+                <SelectContent>
+                  {/* Location options */}
+                  {supportedLocations.map((location) => (
+                    <SelectItem key={location} value={location}>
+                      {location}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
               <div
                 className={`transition-all duration-300 ${
