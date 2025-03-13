@@ -1,12 +1,12 @@
-import ForgotPasswordForm from "@/components/Auth/ForgotPasswordForm";
+import ForgetPasswordEmail from "@/components/Auth/ForgotPasswordEmail";
 import React from "react";
 
-const index = () => {
+const page = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <ForgotPasswordForm />
+      <ForgetPasswordEmail />
     </div>
   );
 };
 
-export default index;
+export default page;

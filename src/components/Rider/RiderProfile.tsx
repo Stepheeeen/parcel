@@ -13,23 +13,35 @@ import { Loader } from "../ui/custom/loader";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
-const UserProfile = () => {
+const RiderProfile = () => {
   const { user, logout } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
 
-  useEffect(() => {
-    if (user) {
-      setIsLoading(false);
-    }
-  }, []);
+  // New state for bike and additional user information
+  const [bikeInfo, setBikeInfo] = useState({
+    plateNo: user?.plateNo || "",
+    model: user?.model || "",
+    type: user?.type || "",
+  });
+
+  const [additionalUserInfo, setAdditionalUserInfo] = useState({
+    nin: user?.nin || "",
+  });
 
   useEffect(() => {
     if (user) {
       setIsLoading(false);
-    } else {
-      setIsLoading(true);
+      // Update bike and user info when user changes
+      setBikeInfo({
+        plateNo: user?.plateNo || "",
+        model: user?.model || "",
+        type: user?.type || "",
+      });
+      setAdditionalUserInfo({
+        nin: user?.nin || "",
+      });
     }
   }, [user]);
 
@@ -53,20 +65,19 @@ const UserProfile = () => {
     <Loader />
   ) : (
     <div className="min-h-screen bg-gray-50/50">
-      {/* Header */}
+      {/* Header - Same as before */}
       <div className="bg-white p-4 flex items-center justify-between border-b">
         <div className="flex items-center justify-between w-full gap-4">
           <div onClick={() => router.back()}>
             <ArrowLeft className="h-9 w-9" />
           </div>
-          <h1 className="text-xl font-[500]">User Profile</h1>
-
+          <h1 className="text-xl font-[500]">Rider Profile</h1>
           <div></div>
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto p-4">
-        {/* Avatar Section */}
+        {/* Avatar Section - Same as before */}
         <div className="flex justify-center mb-8 relative">
           <div className="relative">
             <Avatar className="h-24 w-24 bg-purple-100">
@@ -85,7 +96,7 @@ const UserProfile = () => {
           </div>
         </div>
 
-        {/* Profile Section */}
+        {/* Profile Section - Updated with new inputs */}
         <div className="space-y-6">
           <div className="space-y-7">
             <div className="px-2 md:px-4 space-y-7">
@@ -95,9 +106,7 @@ const UserProfile = () => {
                   <PencilIcon className="h-4 w-4" />
                 </a>
               </h2>
-              {/* <CardContent className="p-4 space-y-4"> */}
               <div>
-                {/* <label className="text-sm text-gray-500">Username</label> */}
                 <InputField
                   placeholder=""
                   disabled={true}
@@ -110,7 +119,6 @@ const UserProfile = () => {
                 />
               </div>
               <div className="mb-9">
-                {/* <label className="text-sm text-gray-500">Email</label> */}
                 <InputField
                   placeholder=""
                   disabled={true}
@@ -119,9 +127,47 @@ const UserProfile = () => {
                 />
               </div>
 
-              {/* </CardContent> */}
+              {/* New NIN Input */}
+              <div>
+                <InputField
+                  placeholder="National Identification Number"
+                  disabled={true}
+                  value={additionalUserInfo.nin}
+                  type="text"
+                />
+              </div>
             </div>
-            {/* Security Section */}
+
+            {/* Bike Information Section */}
+            <div className="px-2 md:px-4 space-y-7">
+              <h2 className="text-xl font-[530] mb-2">Bike Information</h2>
+              <div>
+                <InputField
+                  placeholder="Plate Number"
+                  disabled={true}
+                  value={bikeInfo.plateNo}
+                  type="text"
+                />
+              </div>
+              <div>
+                <InputField
+                  placeholder="Bike Model"
+                  disabled={true}
+                  value={bikeInfo.model}
+                  type="text"
+                />
+              </div>
+              <div>
+                <InputField
+                  placeholder="Bike Type"
+                  disabled={true}
+                  value={bikeInfo.type}
+                  type="text"
+                />
+              </div>
+            </div>
+
+            {/* Security Section - Same as before */}
             <div className="px-2 md:px-4">
               <h2 className="text-[16px] font-[400] mb-3">
                 Security & Password
@@ -130,7 +176,7 @@ const UserProfile = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons - Same as before */}
           <div className="space-y-4 pt-6 px-2 md:px-4">
             <Button label={"Logout"} onClick={handleLogOut} />
             <Button label={"Delete Account"} variant={"secondary"} />
@@ -141,4 +187,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default RiderProfile;

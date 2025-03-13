@@ -34,6 +34,10 @@ export interface IUser {
   vehicle?: IVehicle;
   firstname?: string;
   lastname?: string;
+  plateNo?: string;
+  model?: string;
+  type?: string;
+  nin?: string;
 }
 
 interface IAuthContext {
@@ -73,8 +77,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     "/authentication/signup/rider",
     "/authentication/signup",
     "/authentication/forget-password",
+    "/authentication/forget-password/verify",
     "/authentication/create-password",
     "/authentication/verify",
+    "/authentication/signup/rider/verify",
+    "/authentication/signup/rider/verify-bike",
     "/",
   ];
 

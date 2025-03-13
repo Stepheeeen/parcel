@@ -1,10 +1,10 @@
-import UserProfile from "@/components/User/UserProfile";
+import RiderProfile from "@/components/Rider/RiderProfile";
 import React from "react";
 
 const index = () => {
   return (
     <div>
-      <UserProfile />
+      <RiderProfile />
     </div>
   );
 };

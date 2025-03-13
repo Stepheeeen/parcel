@@ -27,6 +27,7 @@ const InputField = ({
       name={name}
       className="w-full border border-gray-300 rounded-full px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400"
       disabled={disabled}
+      required={true}
     />
   </div>
 );

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React from "react";
 import {
   Bell,
@@ -12,11 +12,12 @@ import {
   Mail,
   Phone,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import Button from "@/components/ui/custom/button";
+import { LoginButton } from "@/components/ui/custom/LoginButton";
 
 const LandingPage = () => {
-
   const router = useRouter();
 
   const features = [
@@ -116,9 +117,14 @@ const LandingPage = () => {
                 Contact
               </a>
             </div>
-            <Button className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all" onClick={()=>router.push("/authentication/signup/rider")}>
-              Become a Rider
-            </Button>
+            {/* className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all" */}
+
+            <div className="w-[200px]">
+              <Button
+                label={"Become a Rider"}
+                onClick={() => router.push("/authentication/signup/rider")}
+              />
+            </div>
           </div>
         </div>
       </nav>
@@ -137,17 +143,25 @@ const LandingPage = () => {
                 guaranteed delivery times. Experience the future of logistics
                 with Parcel.
               </p>
-              <div className="mt-8 sm:mt-10 sm:flex sm:justify-center lg:justify-start space-x-4">
-                <Button className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all" onClick={()=> router.push("/authentication/signup")}>
-                  Create Account
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="mt-3 sm:mt-0 sm:ml-3 px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
-                onClick={() => router.push("/authentication/signin")}>
+              <div className="mt-8 sm:mt-10 sm:flex sm:justify-center lg:justify-start md:space-x-4">
+                <div className="w-[230px] md:w-[300px]">
+                  <Button
+                    label={
+                      <div className="flex items-center justify-center">
+                        Create Account
+                        <ChevronRight className="ml-2 h-5 w-5" />
+                      </div>
+                    }
+                    // className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+                    onClick={() => router.push("/authentication/signup")}
+                  />
+                </div>
+                <button
+                  className="mt-3 sm:mt-0 px-16 text-lg md:w-auto bg-white py-3 rounded-full font-semibold shadow hover:shadow-xl transition-all w-[230px]"
+                  onClick={() => router.push("/authentication/signin")}
+                >
                   Login
-                </Button>
+                </button>
               </div>
             </div>
           </main>
@@ -394,3 +408,6 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
+
+
+// whatever

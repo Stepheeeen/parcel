@@ -21,19 +21,54 @@ const SignUpForm = () => {
     agreeToTerms: false,
   });
 
-  const handleChange = (e: any) => {
+  const [passwordCriteria, setPasswordCriteria] = useState({
+    minLength: false,
+    uppercase: false,
+    lowercase: false,
+    numeric: false,
+    specialChar: false,
+  });
+
+  const passwordRegex = {
+    minLength: /.{6,}/,
+    uppercase: /[A-Z]/,
+    lowercase: /[a-z]/,
+    numeric: /\d/,
+    specialChar: /[!@#$%^&*(),.?":{}|<>]/,
+  };
+
+  const validatePassword = (password: string) => {
+    const newCriteria = {
+      minLength: passwordRegex.minLength.test(password),
+      uppercase: passwordRegex.uppercase.test(password),
+      lowercase: passwordRegex.lowercase.test(password),
+      numeric: passwordRegex.numeric.test(password),
+      specialChar: passwordRegex.specialChar.test(password),
+    };
+
+    setPasswordCriteria(newCriteria);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
+
+    if (name === "password") {
+      validatePassword(value);
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!formData.agreeToTerms) {
       toast({
         title: "Validation Error",
-        description: "You have to agree to terms in order to proceed",
+        description: "You have to agree to terms to proceed.",
         variant: "destructive",
       });
       return;
@@ -42,42 +77,50 @@ const SignUpForm = () => {
     if (formData.confirmPassword !== formData.password) {
       toast({
         title: "Validation Error",
-        description: "Password does not match",
+        description: "Passwords do not match.",
         variant: "destructive",
       });
       return;
     }
 
-    e.preventDefault();
+    // Ensure all password criteria are met
+    if (Object.values(passwordCriteria).includes(false)) {
+      toast({
+        title: "Validation Error",
+        description:
+          "Password does not meet the required criteria. Please check the instructions.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      const { email, password, firstname, lastname } = formData;
+      const { firstname, lastname, email, password } = formData;
 
       const response = await fetch(`/api/riders/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, firstname, lastname }),
+        body: JSON.stringify({ firstname, lastname, email, password }),
       });
 
-      if (response.status < 300 && response.status >= 200) {
+      if (response.ok) {
         localStorage.setItem("v-email-auth", email);
         router.replace("/authentication/verify");
       } else {
         const data = await response.json();
         toast({
           title: "Error",
-          description: data.message,
+          description: data?.message,
           variant: "destructive",
         });
-        return;
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: e?.message ? e.message : e,
+        description: "Something went wrong. Please try again later.",
         variant: "destructive",
       });
-      return;
     } finally {
       setLoading(false);
     }
@@ -86,26 +129,29 @@ const SignUpForm = () => {
   return (
     <>
       {loading && <Loader />}
-      <div className="p-6 py-10 md:py-6 bg-white rounded-md w-full md:max-w-md mx-auto h-auto shadow-none md:shadow-md">
-        <h2 className="text-3xl font-bold mb-1 mx-1">Let's Get Started</h2>
-        <p className="mb-6 md:mb-3 mx-1">
-          Fill in the fields, let’s get to know you.
-        </p>
-        <form className="flex flex-col gap-4 w-full mt-7 space-y-2">
-          <InputField
-            type="text"
-            placeholder="Firstname"
-            name="firstname"
-            value={formData.firstname}
-            onChange={handleChange}
-          />
-           <InputField
-            type="text"
-            placeholder="Lastname"
-            name="lastname"
-            value={formData.lastname}
-            onChange={handleChange}
-          />
+      <div className="p-6 py-10 md:py-6 bg-white rounded-md w-full md:max-w-md mx-auto h-auto md:shadow-md">
+        <h2 className="text-3xl font-bold mb-1">Let's Get Started</h2>
+        <p className="mb-6">Fill in the fields to get started.</p>
+        <form
+          className="flex flex-col gap-4 w-full mt-7"
+          onSubmit={handleSubmit}
+        >
+          <div className="flex items-center gap-2 w-full">
+            <InputField
+              type="text"
+              placeholder="Firstname"
+              name="firstname"
+              value={formData.firstname}
+              onChange={handleChange}
+            />
+            <InputField
+              type="text"
+              placeholder="Lastname"
+              name="lastname"
+              value={formData.lastname}
+              onChange={handleChange}
+            />
+          </div>
           <InputField
             type="email"
             placeholder="Email"
@@ -120,6 +166,57 @@ const SignUpForm = () => {
             value={formData.password}
             onChange={handleChange}
           />
+
+          {!Object.values(passwordCriteria).every(Boolean) && (
+            <div className="text-sm text-gray-600 mt-1">
+              <ul>
+                <li
+                  className={`${
+                    passwordCriteria.minLength
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  At least 6 characters
+                </li>
+                <li
+                  className={`${
+                    passwordCriteria.uppercase
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  At least one uppercase letter
+                </li>
+                <li
+                  className={`${
+                    passwordCriteria.lowercase
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  At least one lowercase letter
+                </li>
+                <li
+                  className={`${
+                    passwordCriteria.numeric ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  At least one numeric character
+                </li>
+                <li
+                  className={`${
+                    passwordCriteria.specialChar
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  At least one special character
+                </li>
+              </ul>
+            </div>
+          )}
+
           <InputField
             type="password"
             placeholder="Confirm Password"
@@ -127,33 +224,34 @@ const SignUpForm = () => {
             value={formData.confirmPassword}
             onChange={handleChange}
           />
+          <div className="flex items-center gap-2 my-3">
+            <input
+              type="checkbox"
+              name="agreeToTerms"
+              checked={formData.agreeToTerms}
+              onChange={handleChange}
+              className="cursor-pointer"
+            />
+            <p className="text-sm">
+              I Agree to the Terms and Conditions & Privacy Policy
+            </p>
+          </div>
+          <div className="mb-[50px] md:mb-2" />
+          <Button label="Proceed" />
         </form>
-        <div className="flex items-center gap-2 my-3 mb-10 md:mb-7">
-          <input
-            type="checkbox"
-            className="cursor-pointer"
-            name="agreeToTerms"
-            checked={formData.agreeToTerms}
-            onChange={handleChange}
-          />
-          <p className="text-sm">
-            I Agree To The Terms And Conditions & Privacy Policy
-          </p>
-        </div>
-        <Button label="Proceed" onClick={handleSubmit} />
         <div className="text-center my-2 text-sm">Or</div>
         <Button
-        disabled={true}
+          disabled
           label={
             <div className="flex items-center justify-center gap-3">
-              <FcGoogle size={35} />
-              <p>Continue With Google</p>
+              <FcGoogle size={20} />
+              <p>Continue with Google</p>
             </div>
           }
           variant="secondary"
         />
         <p className="text-center text-sm mt-4">
-          Already Have An Account?{" "}
+          Already have an account?{" "}
           <a href="/authentication/signin" className="text-yellow-400">
             Sign In
           </a>

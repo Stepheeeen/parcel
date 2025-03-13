@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Parcel",
-  description: "Lokoja's first door-to-door delivery service.",
+  description: "Logistics and Deliveries",
 };
 
 export default function RootLayout({
