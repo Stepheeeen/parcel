@@ -4,7 +4,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { Wallet, ArrowDownCircle, Plus, Receipt, Package, Bell } from "lucide-react";
 import Link from "next/link";
 import { IUser, useAuth } from "@/context/AuthContext";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { getDate } from "@/lib/utils";
 import { Loader } from "../ui/custom/loader";
@@ -57,12 +67,12 @@ const WalletCard = ({ balance, notDeliveredOrders, completedOrders }: { balance:
 
   const handleWithdraw = () => {
     setIsOpen(false);
-    setWithdrawAmount('');
+    setWithdrawAmount("");
   };
 
   return (
     <div className="lg:col-span-2">
-      <h2 className="text-xl font-semibold mt-6 lg:mt-0"></h2>
+      <h2 className="text-xl font-semibld mt-6 lg:mt-0"></h2>
       <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 mt-2 relative overflow-hidden">
         {/* Decorative Pattern */}
         <div className="absolute top-0 right-0 w-64 h-64 transform translate-x-32 -translate-y-32">
@@ -74,7 +84,9 @@ const WalletCard = ({ balance, notDeliveredOrders, completedOrders }: { balance:
             <div className="p-3 bg-[#F9CA44] bg-opacity-20 rounded-full">
               <Wallet className="w-8 h-8 text-[#F9CA44]" />
             </div>
-            <span className="text-lg font-medium text-gray-600">Available Balance</span>
+            <span className="text-lg font-medium text-gray-600">
+              Available Balance
+            </span>
           </div>
 
           <div className="text-4xl font-bold mb-6">NGN {new Intl.NumberFormat().format(balance)}</div>
