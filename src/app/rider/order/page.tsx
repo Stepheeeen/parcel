@@ -1,10 +1,10 @@
 "use client";
-import Stepper from "@/components/User/OrderStepper";
+import Orders from "@/components/Rider/RiderOrder";
 import React from "react";
 
 const index = () => {
   return (
-      <Stepper />
+    <Orders/>
   );
 };
 

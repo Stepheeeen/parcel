@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Wallet, ArrowDownCircle, Plus, Receipt, Package } from "lucide-react";
+import { Wallet, ArrowDownCircle, Plus, Receipt, Package, Bell } from "lucide-react";
 import Link from "next/link";
 import { IUser, useAuth } from "@/context/AuthContext";
 import {
@@ -17,73 +17,54 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { getDate } from "@/lib/utils";
+import { Loader } from "../ui/custom/loader";
+import { IOrder, IWallet } from "@/interfaces/interface";
 
 
-interface IOrder {
-  _id: string;
-  orderId: string;
-  receiverPhone: string;
-  receiverName: string;
-  receiversAddress: string;
-  descr: string;
-  sender: IUser;
-  status: string;
-  paymentStatus: string;
-  receiver?: IUser;
-  timeOfArrival?: Date;
-  cost: string;
-  address: string;
-  rider: IUser;
-  gatewayPaymentId?: string;
-  externalReference?: string;
-  authorizationCode?: string;
-  updatedAt: Date;
-  createdAt: Date;
-}
-
-interface IWallet {
-  balance: number;
-  updatedAt: Date;
-  createdAt: Date;
-  rider: any;
-}
-
-interface IWalletAndTransactions {
-  orders: IOrder[];
-  completedOrders: number;
-  notDeliveredOrders: number;
-  wallet: IWallet
-}
 
 
 // Header Component
-const DashboardHeader = ({ user }: { user: IUser | null }) => (
-  <div className="flex justify-between items-center mt-4">
-    <Link href="profile" className="group flex items-center space-x-4">
-      <div className="relative overflow-hidden flex items-center gap-3 transition-transform group-hover:scale-105">
-        <Avatar className="h-[70px] w-[70px] bg-purple-100">
-          <AvatarImage
-            src={`https://api.dicebear.com/7.x/notionists/svg?seed=${
-              user?.firstname || "Username"
-            }`}
-          />
-          <AvatarFallback>
-            {user ? user.firstname?.slice(0, 2).toUpperCase() : "UN"}
-          </AvatarFallback>
-        </Avatar>
-        <h1 className="text-xl md:text-2xl font-medium block group-hover:text-gray-700">
-          <p className="text-base">username</p>@{user?.firstname}
-        </h1>
+const DashboardHeader = ({ user }: { user: IUser | null }) => {
+  const [isLoading, setLoading] = useState(false);
+
+  return (
+    <>
+      {isLoading &&
+        <Loader />
+      }
+      <div className="flex justify-between items-center mt-4">
+        <Link href="profile" className="group flex items-center space-x-4">
+          <div className="relative overflow-hidden rounded-full transition-transform group-hover:scale-105">
+            <Avatar className="h-[70px] w-[70px] bg-purple-100">
+              <AvatarImage
+                src={`https://api.dicebear.com/7.x/notionists/svg?seed=${user?.firstname || "Username"
+                  }`}
+              />
+              <AvatarFallback>
+                {user
+                  ? user.firstname?.slice(0, 2).toUpperCase()
+                  : "UN"}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+          <h1 className="text-2xl font-medium hidden lg:block group-hover:text-gray-700">
+            {user?.username}
+          </h1>
+        </Link>
+
+        <Link href="/rider/notification">
+          <Bell className="w-6 h-6 text-black" onClick={() => { setLoading(true); }} />
+        </Link>
       </div>
-    </Link>
-  </div>
-);
+    </>
+  );
+};
 
 // Wallet Card Component
-const WalletCard = ({balance, notDeliveredOrders, completedOrders}: {balance:  number, notDeliveredOrders: number, completedOrders: number}{ user }: { user: IUser | null }) => {
+const WalletCard = ({ balance, notDeliveredOrders, completedOrders }: { balance: number, notDeliveredOrders: number, completedOrders: number }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [withdrawAmount, setWithdrawAmount] = useState("");
- 
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+
   const handleWithdraw = () => {
     setIsOpen(false);
     setWithdrawAmount("");
@@ -91,7 +72,7 @@ const WalletCard = ({balance, notDeliveredOrders, completedOrders}: {balance:  n
 
   return (
     <div className="lg:col-span-2">
-      <h2 className="text-xl font-semibold mt-6 lg:mt-0"></h2>
+      <h2 className="text-xl font-semibld mt-6 lg:mt-0"></h2>
       <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 mt-2 relative overflow-hidden">
         {/* Decorative Pattern */}
         <div className="absolute top-0 right-0 w-64 h-64 transform translate-x-32 -translate-y-32">
@@ -107,9 +88,9 @@ const WalletCard = ({balance, notDeliveredOrders, completedOrders}: {balance:  n
               Available Balance
             </span>
           </div>
-          
+
           <div className="text-4xl font-bold mb-6">NGN {new Intl.NumberFormat().format(balance)}</div>
-          
+
           <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
               <button className="flex items-center gap-2 bg-[#F9CA44] text-white px-6 py-3 rounded-lg hover:bg-[#e0b63c] transition-all duration-300">
@@ -148,19 +129,20 @@ const WalletCard = ({balance, notDeliveredOrders, completedOrders}: {balance:  n
           </AlertDialog>
         </div>
       </div>
-      <div className="flex flex-row justify-start gap-4 py-6 px-1">
+      {/* <div className="flex flex-row justify-start gap-4 py-6 px-1">
         <span className="block font-semibold">
-        Completed Deliveries: <span className="font-normal">{completedOrders}</span>
+          Completed Deliveries: <span className="font-normal">{completedOrders}</span>
         </span>
-          <span className="block font-semibold">
+        <span className="block font-semibold">
           Pending Deliveries: <span className="font-normal">{notDeliveredOrders}</span>
         </span>
-      </div>
+      </div> */}
     </div>
   );
 };
 
-const ReceiptModal = ({
+// Reciept Modal Component
+export const ReceiptModal = ({
   order,
   isOpen,
   onClose,
@@ -193,11 +175,10 @@ const ReceiptModal = ({
                 <div className="flex justify-between mb-4">
                   <span className="text-gray-600">Status:</span>
                   <span
-                    className={`capitalize px-2 py-1 rounded-full text-sm font-medium ${
-                      order.status === "delivered"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
+                    className={`capitalize px-2 py-1 rounded-full text-sm font-medium ${order.status === "delivered"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-yellow-100 text-yellow-700"
+                      }`}
                   >
                     {order.status}
                   </span>
@@ -205,11 +186,10 @@ const ReceiptModal = ({
                 <div className="flex justify-between mb-4">
                   <span className="text-gray-600">Payment Status:</span>
                   <span
-                    className={`capitalize font-medium ${
-                      order.paymentStatus === "paid"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
+                    className={`capitalize font-medium ${order.paymentStatus === "paid"
+                      ? "text-green-600"
+                      : "text-red-600"
+                      }`}
                   >
                     {order.paymentStatus}
                   </span>
@@ -263,95 +243,95 @@ const ReceiptModal = ({
 
 
 // Transaction Item Component
-const TransactionItem = ({ order, onClick }: { order: IOrder, 
+export const TransactionItem = ({ order, onClick }: {
+  order: IOrder,
   onClick: () => void
- }) => {
+}) => {
 
   return (
-      <div className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-4 lg:p-6 mt-2 cursor-pointer" onClick={onClick}>
-    <div className="flex justify-between items-center">
-      <div className="flex items-center space-x-3">
-        <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-gray-100 transition-colors">
-          <Package className="w-7 h-7 text-gray-600" />
+    <div className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-4 lg:p-6 mt-2 cursor-pointer" onClick={onClick}>
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-gray-100 transition-colors">
+            <Package className="w-7 h-7 text-gray-600" />
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Transaction ID</p>
+            <p className="font-bold">#{order.orderId}</p>
+          </div>
         </div>
-        <div>
-          <p className="text-sm text-gray-500">Transaction ID</p>
-          <p className="font-bold">#{order.orderId}</p>
-        </div>
-      </div>
-      <span
-        className={`capitalize font-medium px-3 py-1 rounded-full text-sm ${
-          order.status === "delivered"
+        <span
+          className={`capitalize font-medium px-3 py-1 rounded-full text-sm ${order.status === "delivered"
             ? "bg-green-50 text-green-600"
             : "bg-yellow-50 text-yellow-600"
-        }`}
-      >
-        
-        ₦ {new Intl.NumberFormat().format(parseInt(order.cost))}
-      </span>
+            }`}
+        >
+
+          ₦ {new Intl.NumberFormat().format(parseInt(order.cost))}
+        </span>
+      </div>
     </div>
-  </div>
   )
 };
 
 // Main Component
 const WalletDashboard = () => {
-   const {user, accessToken} = useAuth();
+  const { user, accessToken } = useAuth();
   const [wallet, setWallet] = useState<IWallet | null>(null);
   const [orders, setOrders] = useState<IOrder[] | null>(null)
-   const [hasMore, setHasMore] = useState<boolean>(true);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-      const [latestOrder, setLatestOrder] = useState<IOrder | null>(null);
-      const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null);
-      const [isModalOpen, setIsModalOpen] = useState(false);
-      const [completedOrders, setCompletedOrders] = useState(0);
-      const [notDeliveredOrders, setNotDeliveredOrders] = useState(0);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [latestOrder, setLatestOrder] = useState<IOrder | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [completedOrders, setCompletedOrders] = useState(0);
+  const [notDeliveredOrders, setNotDeliveredOrders] = useState(0);
 
-      const page = useRef(1);
-      const limit = useRef(10);
+  const page = useRef(1);
+  const limit = useRef(10);
 
-        const handleOrderClick = (order: IOrder) => {
-          setSelectedOrder(order);
-          setIsModalOpen(true);
-      };
+  const handleOrderClick = (order: IOrder) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
 
-    
-      useEffect(() => {
-          const fetchOrders = async () => {
-            if (!hasMore) return;
-      
-            try {
-              const response = await fetch(
-                `/api/wallets?page=${page.current}&limit=${limit.current}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                  },
-                }
-              );
-      
-              const data = await response.json();
-      
-              if (response.ok) {
-                setWallet(data.wallet)
-                setOrders(data.orders.docs)
-                setLatestOrder(data.orders.docs[0]);
-                setHasMore(data.orders.hasMore);
-                setCompletedOrders(data.completedOrders);
-                setNotDeliveredOrders(data.notDeliveredOrders)
-                setIsLoading(false);
-              } else {
-                console.error("Failed to fetch orders:", data.message);
-                setIsLoading(false);
-              }
-            } catch (error) {
-              console.error("Error fetching orders:", error);
-              setIsLoading(false);
-            }
-          };
-      
-          fetchOrders();
-        }, [accessToken, hasMore]);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (!hasMore) return;
+
+      try {
+        const response = await fetch(
+          `/api/wallets?page=${page.current}&limit=${limit.current}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setWallet(data.wallet)
+          setOrders(data.orders.docs)
+          setLatestOrder(data.orders.docs[0]);
+          setHasMore(data.orders.hasMore);
+          setCompletedOrders(data.completedOrders);
+          setNotDeliveredOrders(data.notDeliveredOrders)
+          setIsLoading(false);
+        } else {
+          console.error("Failed to fetch orders:", data.message);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [accessToken, hasMore]);
 
 
   return (
@@ -360,19 +340,19 @@ const WalletDashboard = () => {
         <DashboardHeader user={user} />
 
         <div className="lg:grid lg:grid-cols-3 lg:gap-8 lg:mt-14">
-          <WalletCard balance = {wallet?.balance || 0} completedOrders= {completedOrders} notDeliveredOrders=  {notDeliveredOrders}/>
-          
+          <WalletCard balance={wallet?.balance || 0} completedOrders={completedOrders} notDeliveredOrders={notDeliveredOrders} />
+
           <div>
             <div className="flex justify-between items-center mt-6 lg:mt-0">
               <h2 className="text-xl font-bold">Recent Orders</h2>
-              <Link href="#" className="text-gray-500 hover:text-gray-700 hover:underline transition-colors">
+              <Link href="/rider/order" className="text-gray-500 hover:text-gray-700 hover:underline transition-colors">
                 See All
               </Link>
             </div>
 
             <div className="space-y-3">
               {orders?.map((order: IOrder) => (
-                <TransactionItem key={order._id} order={order} onClick={() => handleOrderClick(order)}/>
+                <TransactionItem key={order._id} order={order} onClick={() => handleOrderClick(order)} />
               ))}
             </div>
           </div>

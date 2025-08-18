@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Parcel",
   description: "Logistics and Deliveries",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
@@ -31,9 +34,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <SocketProvider>
+          {/* <SocketProvider> */}
             {children}
-          </SocketProvider>
+          {/* </SocketProvider> */}
         </AuthProvider>
         <Toaster />
       </body>

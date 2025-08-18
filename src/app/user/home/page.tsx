@@ -1,3 +1,5 @@
+"use client"
+
 import DeliveryTracking from '@/components/User/DeliveryTracking'
 import { SocketContext } from '@/context/SocketIOContext'
 import React, { useContext, useEffect, useState } from 'react'

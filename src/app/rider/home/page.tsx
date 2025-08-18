@@ -1,3 +1,4 @@
+"use client"
 import WalletDashboard from "@/components/Rider/WalletDashboard";
 import { SocketContext } from "@/context/SocketIOContext";
 import React, { useContext, useEffect, useState } from "react";

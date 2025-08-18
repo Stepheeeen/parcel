@@ -21,9 +21,9 @@ const RiderProfile = () => {
 
   // New state for bike and additional user information
   const [bikeInfo, setBikeInfo] = useState({
-    plateNo: user?.plateNo || "",
-    model: user?.model || "",
-    type: user?.type || "",
+    plateNo: user?.vehicle?.plateNo || "",
+    model: user?.vehicle?.modl || "",
+    type: user?.vehicle?.type || "",
   });
 
   const [additionalUserInfo, setAdditionalUserInfo] = useState({
@@ -35,9 +35,9 @@ const RiderProfile = () => {
       setIsLoading(false);
       // Update bike and user info when user changes
       setBikeInfo({
-        plateNo: user?.plateNo || "",
-        model: user?.model || "",
-        type: user?.type || "",
+        plateNo: user?.vehicle?.plateNo || "",
+        model: user?.vehicle?.modl || "",
+        type: user?.vehicle?.type || "",
       });
       setAdditionalUserInfo({
         nin: user?.nin || "",
@@ -140,12 +140,12 @@ const RiderProfile = () => {
 
             {/* Bike Information Section */}
             <div className="px-2 md:px-4 space-y-7">
-              <h2 className="text-xl font-[530] mb-2">Bike Information</h2>
+              <h2 className="text-xl font-[530] mb-2">Vehicle Information</h2>
               <div>
                 <InputField
                   placeholder="Plate Number"
                   disabled={true}
-                  value={bikeInfo.plateNo}
+                  value={user?.vehicle?.plateNo}
                   type="text"
                 />
               </div>
@@ -153,7 +153,7 @@ const RiderProfile = () => {
                 <InputField
                   placeholder="Bike Model"
                   disabled={true}
-                  value={bikeInfo.model}
+                  value={user?.vehicle?.modl}
                   type="text"
                 />
               </div>
@@ -161,7 +161,7 @@ const RiderProfile = () => {
                 <InputField
                   placeholder="Bike Type"
                   disabled={true}
-                  value={bikeInfo.type}
+                  value={user?.vehicle?.type}
                   type="text"
                 />
               </div>

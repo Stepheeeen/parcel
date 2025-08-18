@@ -1,16 +1,25 @@
 "use client";
+
 import { useState } from "react";
 import Button from "../ui/custom/button";
 import InputField from "../ui/InputField";
-import { toast } from "@/hooks/use-toast";
 import { Loader } from "../ui/custom/loader";
 import { useRouter } from "next/navigation";
+import { MessageDisplay } from "./SignInForm";
 
 const ForgetPasswordEmail = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
+  const [formData, setFormData] = useState({ email: "" });
+
+  const [message, setMessage] = useState<{
+    text: string;
+    type: "error" | "success";
+    isVisible: boolean;
+  }>({
+    text: "",
+    type: "error",
+    isVisible: false,
   });
 
   const validateEmail = (email: string) => {
@@ -31,15 +40,17 @@ const ForgetPasswordEmail = () => {
     const { email } = formData;
 
     if (!email || !validateEmail(email)) {
-      toast({
-        title: "Validation Error",
-        description: "Please enter a valid email address.",
-        variant: "destructive",
+      setMessage({
+        text: "Please enter a valid email address.",
+        type: "error",
+        isVisible: true,
       });
       return;
     }
 
     setLoading(true);
+    setMessage({ ...message, isVisible: false });
+
     try {
       const response = await fetch(`/api/users/reset_password/${email}`, {
         method: "GET",
@@ -47,26 +58,34 @@ const ForgetPasswordEmail = () => {
       });
 
       const data = await response.json();
+      console.log("Resend OTP response:", data);
+
 
       if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Check your email for a password OTP.",
-          variant: "default",
+        setMessage({
+          text: "Check your email for a password reset OTP.",
+          type: "success",
+          isVisible: true,
         });
-        router.push("/authentication/create-password");
+        localStorage.setItem("v-email-auth", email);
+        localStorage.setItem("next-route", "/authentication/create-password");
+
+        // Delay before redirecting to allow message to be read
+        setTimeout(() => {
+          router.push("/authentication/verify");
+        }, 2000);
       } else {
-        toast({
-          title: "Error",
-          description: data?.message,
-          variant: "destructive",
+        setMessage({
+          text: data?.message || "Failed to send reset email.",
+          type: "error",
+          isVisible: true,
         });
       }
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error?.data?.message,
-        variant: "destructive",
+      setMessage({
+        text: error?.data?.message || "Something went wrong. Try again later.",
+        type: "error",
+        isVisible: true,
       });
     } finally {
       setLoading(false);
@@ -74,31 +93,45 @@ const ForgetPasswordEmail = () => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-md w-full md:max-w-lg mx-auto h-full md:h-auto shadow-md">
-      {loading && <Loader />}
-      <h2 className="text-3xl font-bold mb-1 mx-1">Forgot Password?</h2>
-      <p className="mb-6 md:mb-3 mx-1">
-        Input your email address to reset your password.
-      </p>
-      <form
-        className="flex flex-col gap-4 w-full my-4 mb-10 space-y-5"
-        onSubmit={handleSubmit}
-      >
-        <InputField
-          type="email"
-          placeholder="Enter your Email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        <Button label="Proceed" />
-      </form>
-      <p className="text-center text-sm mt-4">
-        Already Have An Account?{" "}
-        <a href="/authentication/signin" className="text-yellow-400">
-          Sign In
-        </a>
-      </p>
+    <div className="md:p-10 rounded-lg w-full md:max-w-xl mx-auto flex justify-center items-center h-[100vh] md:h-auto md:shadow-md z-10 bg-white">
+      <div className="w-full bg-white p-5 md:p-0 shadow-md md:shadow-none">
+        {loading && <Loader />}
+        <h2 className="text-3xl font-bold mb-2 mx-1">Forgot Password?</h2>
+        <p className="mb-6 md:mb-3 mx-1">
+          Input your email address to reset your password.
+        </p>
+
+        <form
+          className="flex flex-col gap-4 w-full my-6 mb-10 space-y-2"
+          onSubmit={handleSubmit}
+        >
+          <InputField
+            type="email"
+            placeholder="Enter your Email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+
+          <MessageDisplay
+            message={message.text}
+            type={message.type}
+            isVisible={message.isVisible}
+          />
+
+
+          <div className="pt-6">
+            <Button label="Proceed" />
+          </div>
+        </form>
+
+        <p className="text-center text-sm mt-2">
+          Already have an account?{" "}
+          <a href="/authentication/signin" className="text-yellow-400">
+            Sign In
+          </a>
+        </p>
+      </div>
     </div>
   );
 };

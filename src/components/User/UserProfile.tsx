@@ -1,9 +1,9 @@
 "use client";
 
-import { ArrowLeft, PencilIcon, Camera } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
+import { ArrowLeft, Camera, EyeOff, Eye } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import Button from "../ui/custom/button";
 import InputField from "../ui/InputField";
 import Link from "next/link";
@@ -17,33 +17,23 @@ const UserProfile = () => {
   const { user, logout } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [showPasswordField, setShowPasswordField] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    if (user) {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      setIsLoading(false);
-    } else {
-      setIsLoading(true);
-    }
+    setIsLoading(!user);
   }, [user]);
 
   const handleLogOut = async () => {
     setIsLoading(true);
     try {
-      logout();
+      await logout();
     } catch (e: any) {
       toast({
-        title: "Error",
-        description: e?.message ? e.message : e,
+        title: "Logout Failed",
+        description: e?.message || "Something went wrong",
         variant: "destructive",
       });
-      return;
     } finally {
       setIsLoading(false);
     }
@@ -52,89 +42,85 @@ const UserProfile = () => {
   return isLoading ? (
     <Loader />
   ) : (
-    <div className="min-h-screen bg-gray-50/50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white p-4 flex items-center justify-between border-b">
-        <div className="flex items-center justify-between w-full gap-4">
-          <div onClick={() => router.back()}>
-            <ArrowLeft className="h-9 w-9" />
-          </div>
-          <h1 className="text-xl font-[500]">User Profile</h1>
-
-          <div></div>
-        </div>
+      <div className="bg-white border-b px-4 py-3 flex items-center justify-between">
+        <button onClick={() => router.back()}>
+          <ArrowLeft className="h-6 w-6 text-gray-700" />
+        </button>
+        <h1 className="text-lg font-semibold text-gray-800">User Profile</h1>
+        <div className="w-6" /> {/* spacer for alignment */}
       </div>
 
-      <div className="max-w-2xl mx-auto p-4">
-        {/* Avatar Section */}
-        <div className="flex justify-center mb-8 relative">
-          <div className="relative">
-            <Avatar className="h-24 w-24 bg-purple-100">
-              <AvatarImage
-                src={`https://api.dicebear.com/7.x/notionists/svg?seed=${
-                  user?.username || user?.firstname || "Username"
+      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+        {/* Avatar */}
+        <div className="flex justify-center relative">
+          <Avatar className="h-24 w-24 bg-purple-100">
+            <AvatarImage
+              src={`https://api.dicebear.com/7.x/notionists/svg?seed=${user?.username || user?.firstname || "Username"
                 }`}
-              />
-              <AvatarFallback>
-                {user && user.role == "user"
-                  ? user?.username.charAt(0).toUpperCase() +
-                    user?.username.charAt(1).toUpperCase()
-                  : "UN"}
-              </AvatarFallback>
-            </Avatar>
+              alt="User Avatar"
+            />
+            <AvatarFallback>
+              {user?.username?.slice(0, 2).toUpperCase() || "UN"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="absolute bottom-1 right-1 bg-white rounded-full p-1 shadow">
+            <Camera className="h-4 w-4 text-gray-600" />
           </div>
         </div>
 
-        {/* Profile Section */}
-        <div className="space-y-6">
-          <div className="space-y-7">
-            <div className="px-2 md:px-4 space-y-7">
-              <h2 className="text-xl font-[530] mb-2 flex items-center justify-between">
-                Profile
-                <a>
-                  <PencilIcon className="h-4 w-4" />
-                </a>
-              </h2>
-              {/* <CardContent className="p-4 space-y-4"> */}
-              <div>
-                {/* <label className="text-sm text-gray-500">Username</label> */}
-                <InputField
-                  placeholder=""
-                  disabled={true}
-                  value={`${
-                    user?.username ||
-                    `${user?.firstname} ${user?.lastname}` ||
-                    "John Doe"
-                  }`}
-                  type="text"
-                />
-              </div>
-              <div className="mb-9">
-                {/* <label className="text-sm text-gray-500">Email</label> */}
-                <InputField
-                  placeholder=""
-                  disabled={true}
-                  value={`${user?.email || "parcel@gmail.com"}`}
-                  type="email"
-                />
-              </div>
+        {/* Profile Info */}
+        <Card>
+          <CardContent className="p-5 space-y-4">
+            <h2 className="text-base font-medium text-gray-700">Profile Info</h2>
+            <InputField
+              label="Username"
+              placeholder="Enter your username"
+              disabled
+              value={
+                user?.username || `${user?.firstname} ${user?.lastname}` || "John Doe"
+              }
+              type="text"
+            />
+            <InputField
+              placeholder="Enter your first name"
+              label="Email"
+              disabled
+              value={user?.email || "parcel@gmail.com"}
+              type="email"
+            />
 
-              {/* </CardContent> */}
-            </div>
-            {/* Security Section */}
-            <div className="px-2 md:px-4">
-              <h2 className="text-[16px] font-[400] mb-3">
-                Security & Password
-              </h2>
-              <InputField type="password" placeholder="Change Password" />
-            </div>
-          </div>
+            <InputField
+              placeholder="Enter your Phone number"
+              label="Phone Number"
+              disabled
+              value={user?.phone || ""}
+              type="text"
+            />
+          </CardContent>
+        </Card>
 
-          {/* Action Buttons */}
-          <div className="space-y-4 pt-6 px-2 md:px-4">
-            <Button label={"Logout"} onClick={handleLogOut} />
-            <Button label={"Delete Account"} variant={"secondary"} />
-          </div>
+        {/* Security Section */}
+        <Card>
+          <CardContent className="p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-medium text-gray-700">Security</h2>
+              <Switch
+                checked={showPasswordField}
+                onCheckedChange={setShowPasswordField}
+              />
+            </div>
+            {showPasswordField && (
+              <InputField type="password" placeholder="New Password" />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Action Buttons */}
+        <div className="space-y-3 pt-4">
+          <Button label="Log Out" onClick={handleLogOut} />
+          <Button label="Delete Account" variant="secondary" />
         </div>
       </div>
     </div>

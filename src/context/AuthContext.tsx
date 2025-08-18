@@ -34,9 +34,7 @@ export interface IUser {
   vehicle?: IVehicle;
   firstname?: string;
   lastname?: string;
-  plateNo?: string;
-  model?: string;
-  type?: string;
+
   nin?: string;
   balance?: any;
 }

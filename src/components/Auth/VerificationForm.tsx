@@ -1,79 +1,119 @@
 "use client";
+
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Button from "../ui/custom/button";
+import { Loader } from "../ui/custom/loader";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
-import { Loader } from "../ui/custom/loader";
+import { MessageDisplay } from "./SignInForm";
+import next from "next";
 
 const VerificationForm = () => {
   const router = useRouter();
-
-  const { toast } = useToast();
-
   const [code, setCode] = useState("");
-
   const [email, setEmail] = useState("");
-
+  const [nextRoute, setNextRoute] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<{
+    text: string;
+    type: "error" | "success";
+    isVisible: boolean;
+  }>({
+    text: "",
+    type: "error",
+    isVisible: false,
+  });
 
   useEffect(() => {
-    setEmail(localStorage.getItem("v-email-auth") as string);
+    const savedEmail = localStorage.getItem("v-email-auth");
+    const nextRoute = localStorage.getItem("next-route");
+    if (nextRoute) setNextRoute(nextRoute);
+    else setNextRoute("/user/home");
+    if (savedEmail) setEmail(savedEmail);
   }, []);
 
-  const handleComplete = async (value: string) => {
-    setCode(value);
-    if (value.length === 6) {
-      setIsSubmitting(true);
-      try {
-        const response = await fetch("/api/users/verify_email", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ otp: value, email }),
+  const handleVerification = async (otp: string) => {
+    if (otp.length !== 6 || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setMessage({ ...message, isVisible: false });
+
+    try {
+      // 🔒 If this is password reset flow, skip API call and just redirect
+      if (nextRoute === "/authentication/create-password") {
+        localStorage.setItem("reset-password-otp", otp);
+        setMessage({
+          text: "OTP accepted. Redirecting to password reset...",
+          type: "success",
+          isVisible: true,
         });
 
-        const data = await response.json();
-        // console.log(data);
+        setTimeout(() => {
+          router.replace(nextRoute);
+        }, 1500);
+        return;
+      }
 
-        if (response.status < 300 && response.status >= 200) {
-          // save token and user data
-          localStorage.setItem("user_data", JSON.stringify(data));
-          localStorage.setItem("access_token", data.accessToken);
-          localStorage.removeItem("v-email-auth");
+      // ✅ Normal email verification flow
+      const response = await fetch("/api/users/verify_email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ otp, email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("user_data", JSON.stringify(data));
+        localStorage.setItem("access_token", data.accessToken);
+        localStorage.setItem("reset-password-otp", otp);
+        localStorage.removeItem("v-email-auth");
+
+        setMessage({
+          text: "Verification successful. Redirecting...",
+          type: "success",
+          isVisible: true,
+        });
+
+        setTimeout(() => {
           if (data.user.role === "rider") {
             router.replace("/authentication/signup/rider/verify");
           } else {
-            router.replace("/user/home");
+            router.replace(nextRoute);
           }
-        } else {
-          toast({
-            title: "Error",
-            description: data.error,
-            variant: "destructive",
-          });
-          return;
-        }
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to verify email",
-          variant: "destructive",
+        }, 1500);
+      } else {
+        setMessage({
+          text: data.error || "Invalid OTP provided.",
+          type: "error",
+          isVisible: true,
         });
-      } finally {
-        setIsSubmitting(false);
       }
+    } catch (err) {
+      setMessage({
+        text: "Something went wrong. Please try again.",
+        type: "error",
+        isVisible: true,
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+
   const handleResendOtp = async () => {
+    if (!email) return;
+
     setIsSubmitting(true);
+    setMessage({ ...message, isVisible: false });
+
     try {
       const response = await fetch("/api/users/resend_verification_otp", {
         method: "POST",
@@ -82,28 +122,27 @@ const VerificationForm = () => {
         },
         body: JSON.stringify({ email }),
       });
-      const data = await response.json();
-      // console.log(response.data);
 
-      if (response.status < 300 && response.status >= 200) {
-        toast({
-          title: "Success",
-          description: "OTP sent successfully",
-          variant: "default",
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage({
+          text: "A new OTP has been sent to your email.",
+          type: "success",
+          isVisible: true,
         });
       } else {
-        toast({
-          title: "Error",
-          description: data.error,
-          variant: "destructive",
+        setMessage({
+          text: data.error || "Failed to resend OTP.",
+          type: "error",
+          isVisible: true,
         });
-        return;
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to verify email",
-        variant: "destructive",
+      setMessage({
+        text: "Something went wrong while resending OTP.",
+        type: "error",
+        isVisible: true,
       });
     } finally {
       setIsSubmitting(false);
@@ -111,45 +150,67 @@ const VerificationForm = () => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-md w-full pl-5 max-w-md mx-auto shadow-none md:shadow-md">
+    <div className="p-5 md:p-10 bg-white w-full h-auto rounded-lg md:max-w-lg mx-auto shadow-none md:shadow-md z-10">
       {isSubmitting && <Loader />}
-      <h2 className="text-2xl font-bold mb-1 mx-1">Email Verification</h2>
-      <p className="mb-9 text-base mx-1 text-gray-500">
-        A 6 digit code was sent to the address {email}
-      </p>
-      <div className="flex flex-col items-center justify-center w-full gap-4 sm:gap-5 md:gap-6 mb-14 px-4">
-        <InputOTP
-          maxLength={6}
-          value={code}
-          onChange={(value) => setCode(value)}
-          onComplete={handleComplete}
-          className="flex flex-wrap justify-center gap-3"
-        >
-          {[0, 1, 2, 3, 4, 5].map((index) => (
-            <InputOTPGroup key={`group-1-${index}`}>
-              <InputOTPSlot
-                index={index}
-                className="p-4 sm:p-5 text-xl sm:text-2xl border border-black w-12 h-12 sm:w-14 sm:h-14 text-center"
-              />
-            </InputOTPGroup>
-          ))}
-        </InputOTP>
 
-        <div className="w-full flex justify-end">
-          <p
-            className="text-sm sm:text-md text-yellow-400 hover:underline cursor-pointer"
-            onClick={handleResendOtp}
-          >
-            Resend Code
-          </p>
-        </div>
+      <div>
+        <h2 className="text-2xl md:text-3xl font-bold mb-2">
+          Email Verification
+        </h2>
+
+        <p className="mb-6 text-base mx-1 text-gray-500">
+          Enter the 6-digit code sent to <strong>{email}</strong>
+        </p>
+
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
+          <div className="flex flex-col space-y-2 justify-between items-center w-full gap-3">
+            <InputOTP
+              maxLength={6}
+              value={code}
+              onChange={(val) => setCode(val)}
+              onComplete={handleVerification}
+            >
+              {[0, 1, 2, 3, 4, 5].map((index) => (
+                <InputOTPGroup key={index}>
+                  <InputOTPSlot
+                    index={index}
+                    className="p-6 text-2xl border border-black"
+                  />
+                </InputOTPGroup>
+              ))}
+            </InputOTP>
+
+            <button
+              type="button"
+              className="text-sm text-yellow-500 hover:text-yellow-600"
+              onClick={handleResendOtp}
+              disabled={isSubmitting}
+            >
+              Resend Code
+            </button>
+          </div>
+
+          <MessageDisplay
+            message={message.text}
+            type={message.type}
+            isVisible={message.isVisible}
+          />
+
+          <Button
+            label="Verify"
+            disabled={code.length !== 6 || isSubmitting}
+            onClick={() => handleVerification(code)}
+          />
+        </form>
+
+        <p className="text-center text-sm mt-2">
+          Already have an account?{" "}
+          <a href="/authentication/signin" className="text-yellow-400">
+            Sign In
+          </a>
+        </p>
       </div>
 
-      <Button
-        label="Verify"
-        disabled={code.length !== 6 || isSubmitting}
-        onClick={() => handleComplete(code)}
-      />
     </div>
   );
 };

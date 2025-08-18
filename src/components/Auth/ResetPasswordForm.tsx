@@ -1,29 +1,64 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import Button from "../ui/custom/button";
 import InputField from "../ui/InputField";
 import { Loader } from "../ui/custom/loader";
-import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { MessageDisplay } from "./SignInForm";
 
 const ResetPasswordForm = () => {
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const [error, setError] = useState("");
+
+  const [message, setMessage] = useState<{
+    text: string;
+    type: "error" | "success";
+    isVisible: boolean;
+  }>({
+    text: "",
+    type: "error",
+    isVisible: false,
+  });
+
+  useEffect(() => {
+    const savedOTP = localStorage.getItem("reset-password-otp");
+    if (savedOTP) setOtp(savedOTP);
+    else {
+      setMessage({
+        text: "No OTP found. Please request a new one.",
+        type: "error",
+        isVisible: true,
+      });
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!otp || !password || !confirmPassword) {
+      setMessage({
+        text: "All fields are required.",
+        type: "error",
+        isVisible: true,
+      });
+      return;
+    }
+
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setMessage({
+        text: "Passwords do not match.",
+        type: "error",
+        isVisible: true,
+      });
       return;
     }
 
     setLoading(true);
-    setError("");
+    setMessage({ ...message, isVisible: false });
 
     try {
       const response = await fetch("/api/users/reset_password", {
@@ -31,69 +66,84 @@ const ResetPasswordForm = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          otp,
-          password,
-        }),
+        body: JSON.stringify({ otp, password }),
       });
-      console.log()
-      if (!response.ok) {
-        toast({
-          title: "Error",
-          description: "Something went wrong. Please try again.",
-          variant: "destructive",
-        });
-      } else {
-        router.replace("/authentication/signin");
-      }
 
       const data = await response.json();
-      console.log("Password reset success:", data);
-      // Handle success (e.g., redirect user or show confirmation message)
-    } catch (err: any) {
+      console.log(data)
+
+
+      if (response.ok) {
+        setMessage({
+          text: "Password reset successfully. Redirecting...",
+          type: "success",
+          isVisible: true,
+        });
+
+        setTimeout(() => {
+          localStorage.removeItem("reset-password-otp");
+          router.replace("/authentication/signin");
+        }, 2000);
+      } else {
+        setMessage({
+          text: data?.error || data?.message,
+          type: "error",
+          isVisible: true,
+        });
+      }
+    } catch (err) {
       console.error("Error resetting password:", err);
-      setError("An error occurred. Please try again.");
+      setMessage({
+        text: "An unexpected error occurred. Please try again.",
+        type: "error",
+        isVisible: true,
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 bg-white rounded-md w-full md:max-w-md mx-auto h-full md:h-auto shadow-md">
-      {loading && <Loader />}
-      <h2 className="text-3xl font-bold mb-1 mx-1">Create Password</h2>
-      <p className="mb-6 md:mb-3 mx-1">Input a new password</p>
-      <form
-        className="flex flex-col gap-4 w-full my-4 mb-10"
-        onSubmit={handleSubmit}
-      >
-        <InputField
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e: any) => setPassword(e.target.value)}
-        />
-        <InputField
-          type="password"
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e: any) => setConfirmPassword(e.target.value)}
-        />
-        <InputField
-          type="text"
-          placeholder="Input OTP"
-          value={otp}
-          onChange={(e: any) => setOtp(e.target.value)}
-        />
-        <div className="mt-7"/>
-        <Button label={"Reset Password"} />
-      </form>
-      <p className="text-center text-sm mt-4">
-        Already Have An Account?{" "}
-        <a href="/authentication/signin" className="text-yellow-400">
-          Sign In
-        </a>
-      </p>
+    <div className="md:p-6 rounded-md w-full md:max-w-md mx-auto h-[100vh] md:h-auto md:shadow-md z-10 bg-white">
+      <div className="w-full bg-white p-5 md:p-0 shadow-md md:shadow-none">
+        {loading && <Loader />}
+        <h2 className="text-3xl font-bold mb-1 mx-1">Create Password</h2>
+        <p className="mb-6 md:mb-3 mx-1">Input a new password</p>
+
+        <form
+          className="flex flex-col gap-4 w-full my-4 mb-10"
+          onSubmit={handleSubmit}
+        >
+          <InputField
+            type="password"
+            placeholder="New Password"
+            value={password}
+            onChange={(e: any) => setPassword(e.target.value)}
+          />
+          <InputField
+            type="password"
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e: any) => setConfirmPassword(e.target.value)}
+          />
+
+          <MessageDisplay
+            message={message.text}
+            type={message.type}
+            isVisible={message.isVisible}
+          />
+
+          <div className="mt-5" />
+          <Button label="Reset Password" />
+        </form>
+
+        <p className="text-center text-sm mt-4">
+          Already have an account?{" "}
+          <a href="/authentication/signin" className="text-yellow-400">
+            Sign In
+          </a>
+        </p>
+      </div>
     </div>
   );
 };
