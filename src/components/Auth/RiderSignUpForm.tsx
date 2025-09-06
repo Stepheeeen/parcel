@@ -109,6 +109,7 @@ const SignUpForm = () => {
 
       if (response.ok) {
         localStorage.setItem("v-email-auth", email);
+        localStorage.setItem("next-route", "/authentication/signup/rider/verify");
         router.replace("/authentication/verify");
       } else {
         const data = await response.json();
@@ -194,65 +195,60 @@ const SignUpForm = () => {
                   value={formData.email}
                   onChange={handleChange}
                 />
-                
-                <InputField
-  type="password"
-  placeholder="Password"
-  name="password"
-  value={formData.password}
-  onChange={handleChange}
-/>
 
-{/* Password Criteria */}
-{formData.password && (
-  <div className="text-sm text-gray-600 mt-1">
-    <ul>
-      <li
-        className={`${
-          passwordCriteria.minLength
-            ? "text-green-600"
-            : "text-red-600"
-        }`}
-      >
-        At least 6 characters
-      </li>
-      <li
-        className={`${
-          passwordCriteria.uppercase
-            ? "text-green-600"
-            : "text-red-600"
-        }`}
-      >
-        At least one uppercase letter
-      </li>
-      <li
-        className={`${
-          passwordCriteria.lowercase
-            ? "text-green-600"
-            : "text-red-600"
-        }`}
-      >
-        At least one lowercase letter
-      </li>
-      <li
-        className={`${
-          passwordCriteria.numeric ? "text-green-600" : "text-red-600"
-        }`}
-      >
-        At least one numeric character
-      </li>
-      <li
-        className={`${
-          passwordCriteria.specialChar
-            ? "text-green-600"
-            : "text-red-600"
-        }`}
-      >
-        At least one special character
-      </li>
-    </ul>
-  </div>
-)}
+                <InputField
+                  type="password"
+                  placeholder="Password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+
+                {/* Password Criteria */}
+                {formData.password && (
+                  <div className="text-sm text-gray-600 mt-1">
+                    <ul>
+                      <li
+                        className={`${passwordCriteria.minLength
+                          ? "text-green-600"
+                          : "text-red-600"
+                          }`}
+                      >
+                        At least 6 characters
+                      </li>
+                      <li
+                        className={`${passwordCriteria.uppercase
+                          ? "text-green-600"
+                          : "text-red-600"
+                          }`}
+                      >
+                        At least one uppercase letter
+                      </li>
+                      <li
+                        className={`${passwordCriteria.lowercase
+                          ? "text-green-600"
+                          : "text-red-600"
+                          }`}
+                      >
+                        At least one lowercase letter
+                      </li>
+                      <li
+                        className={`${passwordCriteria.numeric ? "text-green-600" : "text-red-600"
+                          }`}
+                      >
+                        At least one numeric character
+                      </li>
+                      <li
+                        className={`${passwordCriteria.specialChar
+                          ? "text-green-600"
+                          : "text-red-600"
+                          }`}
+                      >
+                        At least one special character
+                      </li>
+                    </ul>
+                  </div>
+                )}
                 <div className="flex items-center gap-2 my-3">
                   <input
                     title="i agree"
@@ -274,15 +270,17 @@ const SignUpForm = () => {
                   Sign In
                 </a>
               </p>
+              <div className="mt-16 text-center">
+                <div className="text-center mt-8 mb-4">
+                  <span className="text-sm text-gray-400">OR</span>
+                </div>
+                <Button label="Sign up as a user" variant="secondary" onClick={() => router.push('/authentication/signup')} />
+              </div>
             </div>
+
           </div>
         </div>
       </div>
-      {/* If you need the modal from the other layout, you'll need to define it here */}
-      {/* <PrivacyPolicyModal
-        isOpen={isPrivacyPolicyOpen}
-        onClose={handleClosePrivacyPolicyModal}
-      /> */}
     </>
   );
 };

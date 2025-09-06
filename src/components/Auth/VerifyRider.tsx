@@ -75,7 +75,7 @@ export default function VerificationForm() {
   return (
     <div className="h-screen flex pt-[20%] md:pt-8 md:items-center justify-center p-2 md:p-8">
       {loading && <Loader />}
-      <div className="bg-white p-6 md:p-12 rounded-lg w-full max-w-md md:max-w-2xl lg:max-w-3xl md:shadow-lg">
+      <div className="bg-white p-6 md:p-12 rounded-lg w-full max-w-md md:max-w-lg lg:max-w-xl md:shadow-lg">
         <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-10">
           Rider Verification
         </h2>
