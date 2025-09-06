@@ -102,9 +102,9 @@ const RiderProfile = () => {
             <div className="px-2 md:px-4 space-y-7">
               <h2 className="text-xl font-[530] mb-2 flex items-center justify-between">
                 Profile
-                <a>
+                {/* <a>
                   <PencilIcon className="h-4 w-4" />
-                </a>
+                </a> */}
               </h2>
               <div>
                 <InputField

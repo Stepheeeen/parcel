@@ -489,7 +489,7 @@ const SignUpForm = () => {
           </div>
 
           {/* Right Panel */}
-          <div className="w-full h-full grid place-items-center md:w-1/2 md:p-12">
+          <div className="w-full h-full grid place-items-center md:w-1/2 overflow-y-scroll pb-5 md:p-12">
             <div className="absolute inset-0 bg-black bg-opacity-10 w-full h-[100vh] md:hidden">
               <Image
                 src={backgroundImageMobile}

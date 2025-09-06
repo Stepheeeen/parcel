@@ -36,6 +36,7 @@ export interface IUser {
   lastname?: string;
 
   nin?: string;
+  balance?: any;
 }
 
 interface IAuthContext {
@@ -187,9 +188,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isAuthenticated: !!user,
   };
 
-  return (
-    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export function useAuth() {
