@@ -1,8 +1,6 @@
 // next.config.mjs
 /** @type {import('next').NextConfig} */
-import { createProxyMiddleware } from 'http-proxy-middleware';
-
-export default {
+const nextConfig = {
   async rewrites() {
     return [
       {
@@ -11,4 +9,9 @@ export default {
       },
     ];
   },
+  images: {
+    domains: ["images.unsplash.com"], // 👈 add allowed image domains here
+  },
 };
+
+export default nextConfig;

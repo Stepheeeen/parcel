@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { Inter } from "next/font/google";
 import Link from "next/link";
-import bike from "../../public/illustration/bike-illustration.png";
+import delivery from "../../public/illustration/image.png";
+import about from "../../public/authentication/white-bg.png";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Package, Clock, MapPin, ShieldCheck  } from "lucide-react";
-// import { } from 'lucide-react';
+import { Package, Clock, MapPin, ShieldCheck, ArrowDownRight, ArrowRight, Instagram, Linkedin, Facebook, X, Twitter } from "lucide-react";
+import cta from '../../public/bg/cta-bg.jpg'
 import { PrivacyPolicyModal, TermsAndConditionsModal } from "@/components/Auth/TermsandPolicy";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -48,6 +49,7 @@ const useIntersectionObserver = (
 
 // Animation wrapper component (remains the same)
 import type { ReactNode } from "react";
+import { FaInstagram, FaTiktok, FaTwitter } from "react-icons/fa";
 
 type FadeInProps = {
   children: ReactNode;
@@ -61,9 +63,8 @@ const FadeIn = ({ children, className = "", delay = 0 }: FadeInProps) => {
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out ${
-        isIntersecting ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
-      } ${className}`}
+      className={`transition-all duration-700 ease-out ${isIntersecting ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
+        } ${className}`}
       style={{ transitionDelay: `${delay}ms` }}
     >
       {children}
@@ -86,32 +87,37 @@ const Navigation = () => {
   }, []);
 
   return (
-    <nav
-      // className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300  `}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white shadow-md" : "bg-transparent"
-      }`}
-    >
+    <nav className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-7/12 max-w-6xl rounded-2xl bg-white/80 border border-gray-200 shadow-md backdrop-blur-md px-2 ${isScrolled ? "bg-white shadow-md" : "bg-transparent"
+      }`}>
+      {/* <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 `}
+    > */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
               <Package className="w-8 h-8 text-yellow-500" />
-              <span className={`ml-2 text-xl font-bold ${isScrolled ? "text-gray-900" : "text-white"}`}>
+              <span className={`ml-2 text-xl font-bold ${isScrolled ? "text-gray-900" : ""}`}>
                 Parcel
               </span>
             </div>
           </div>
 
           <div className="hidden md:block">
-            <div className="ml-10 flex items-center space-x-8">
-              <Link href="#home" className={`px-3 py-2 text-sm font-medium transition-colors ${isScrolled ? "text-gray-900 hover:text-yellow-600" : "text-white hover:text-yellow-600"}`}>
+            <div className="ml-10 flex items-center space-x-2">
+              <Link href="#home" className={`px-3 py-2 text-sm font-medium transition-colors ${isScrolled ? "text-gray-900 hover:text-yellow-600" : "text-gray-900 hover:text-yellow-600"}`}>
                 Home
               </Link>
-              <Link href="#how-it-works" className={`px-3 py-2 text-sm font-medium transition-colors ${isScrolled ? "text-gray-900 hover:text-yellow-600" : "text-white hover:text-yellow-600"}`}>
-                Get Started
+              <Link href="#about" className={`px-3 py-2 text-sm font-medium transition-colors ${isScrolled ? "text-gray-900 hover:text-yellow-600" : "text-gray-900 hover:text-yellow-600"}`}>
+                About
               </Link>
-              <Link href="#contact" className={`px-3 py-2 text-sm font-medium transition-colors ${isScrolled ? "text-gray-900 hover:text-yellow-600" : "text-white hover:text-yellow-600"}`}>
+              <Link href="#service" className={`px-3 py-2 text-sm font-medium transition-colors ${isScrolled ? "text-gray-900 hover:text-yellow-600" : "text-gray-900 hover:text-yellow-600"}`}>
+                Services
+              </Link>
+              {/* <Link href="#how-it-works" className={`px-3 py-2 text-sm font-medium transition-colors ${isScrolled ? "text-gray-900 hover:text-yellow-600" : "text-gray-900 hover:text-yellow-600"}`}>
+                Get Started
+              </Link> */}
+              <Link href="#contact" className={`px-3 py-2 text-sm font-medium transition-colors ${isScrolled ? "text-gray-900 hover:text-yellow-600" : "text-gray-900 hover:text-yellow-600"}`}>
                 Contact
               </Link>
             </div>
@@ -119,10 +125,10 @@ const Navigation = () => {
 
           <div className="flex items-center">
             <button
-              className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 animate-pulse"
+              className="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105"
               onClick={() => router.push("/authentication/signin")}
             >
-              Send Parcel
+              Sign In
             </button>
           </div>
         </div>
@@ -136,59 +142,174 @@ const HeroSection = () => {
   const router = useRouter();
   return (
     <section
-  id="home"
-  className="relative py-24 overflow-hidden" // Removed bg-gradient classes
->
-  {/* Background Image Layer */}
-  <div
-    className="absolute inset-0 bg-cover bg-no-repeat"
-    style={{ backgroundImage: "url('/man.jpg')" }} // Replace this with your image path
-  >
-    {/* Semi-transparent Overlay for Readability */}
-    <div className="absolute inset-0 bg-black/50"></div>
-  </div>
+      id="home"
+      className="relative scroll pt-20 overflow-hidden bg-white h-screen" // Removed bg-gradient classes
+    >
 
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-      <div className="text-center md:text-left">
-        <FadeIn>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight mb-4">
-            Fast and Reliable <br />
-            <span className="text-yellow-400">Delivery Service</span>
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-200 mb-8 max-w-lg leading-relaxed">
-            Send packages across Lokoja city with tracking and guaranteed
-            delivery. Experience the future of logistics with Parcel.
-          </p>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <button
-              className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 rounded-md text-lg font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105 hover:-translate-y-1"
-              onClick={() => router.push("/authentication/signup")}
-            >
-              Send Parcel Now
-            </button>
-            {/* Optional: Add a secondary action button if needed */}
+      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 place-items-center">
+          <div className="text-center pt-16">
+            <FadeIn>
+              <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold leading-normal tracking-tight">
+                Fast and Reliable <br />
+                <span className="bg-yellow-400 rounded">Delivery </span>Service
+              </h1>
+              <p className="text-lg md:text-xl text-gray-500 max-w-md leading-relaxed my-4 text-center mx-auto">
+                Send packages across Lokoja city with tracking and guaranteed
+                delivery. <br /> The future of logistics.
+              </p>
+              {/* <div className="flex flex-row items-center">
+                <button
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 rounded-md text-lg font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105 hover:-translate-y-1"
+                  onClick={() => router.push("/authentication/signup")}
+                >
+                  Send Parcel Now
+                </button>
+              </div> */}
+            </FadeIn>
           </div>
-        </FadeIn>
-      </div>
 
-      <FadeIn delay={400}>
-        <div className="mt-10 md:mt-0">
-          <Image
-            src={bike}
-            alt="Rider delivering parcel"
-            className="w-full h-auto rounded-lg shadow-lg"
-            style={{ maxWidth: "500px", margin: "0 auto" }}
-          />
+          <FadeIn delay={200}>
+            <div className="w-full">
+              <Image
+                src={delivery}
+                alt="Delivery Illustration"
+                className="h-2/3"
+                priority
+              />
+            </div>
+          </FadeIn>
         </div>
-      </FadeIn>
-    </div>
-  </div>
-</section>
+      </div>
+    </section>
   );
 };
+const AboutSection = () => {
+  const router = useRouter();
+  return (
+    <section
+      id="about"
+      className="relative scroll overflow-hidden bg-gray-100 h-screen w-full flex justify-center items-center rounded-3xl mt-12" // Removed bg-gradient classes
+    >
+      <div className="max-w-full mx-auto pl-4 lg:pl-8 absolute z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 place-items-center gap-x-4">
+          <FadeIn>
+            <h1 className="text-4xl md:text-7xl font-extrabold leading-normal tracking-tight mb-4">
+              <span className="bg-yellow-400 rounded">About </span>Us
+            </h1>
+            <div className="mt-8">
+              {/* <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold leading-normal tracking-tight">
+                Fast and Reliable <br />
+                <span className="bg-yellow-400 rounded">Delivery </span>Service
+              </h1> */}
+              <p className="text-lg text-gray-700 leading-relaxed mb-4">
+                At <span className="font-semibold text-gray-900">Parcel</span>, we
+                make local deliveries simple, reliable, and transparent. Our mission
+                is to help individuals and businesses send packages{" "}
+                <span className="font-medium text-yellow-600">
+                  seamlessly across Lokoja city
+                </span>
+                , backed by real-time tracking and guaranteed delivery.
+              </p>
 
+              <p className="text-lg text-gray-700 leading-relaxed mb-4">
+                We believe the <span className="font-semibold">future of logistics</span>{" "}
+                is built on trust, speed, and technology. That’s why we combine a
+                dedicated delivery network with smart tools that give you full
+                visibility from pickup to drop-off.
+              </p>
 
+              <p className="text-lg text-gray-700 leading-relaxed">
+                Whether it’s a personal item or a business shipment, Parcel ensures
+                that every delivery is handled with care, efficiency, and
+                accountability. We’re more than just a courier — we’re your logistics
+                partner for the modern city.
+              </p>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={200}>
+            <div className="relative w-full h-screen">
+              {/* Background Image */}
+              <Image
+                src={about}
+                alt="About Illustration"
+                className="w-full h-full object-cover"
+                priority
+              />
+
+              {/* Overlay */}
+              <div className="absolute bg-white/50" />
+
+              {/* Centered Content */}
+              <div className="absolute inset-0 flex items-center justify-center z-10">
+                <div className="flex items-center bg-white px-10 py-6">
+                  <Package className="w-32 h-32 text-gray-900" />
+                  <span className="ml-4 text-7xl font-extrabold text-gray-900">
+                    Parcel
+                  </span>
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+
+        </div>
+      </div>
+    </section>
+  );
+};
+const ServiceSection = () => {
+  return (
+    <section id="service" className="py-20 bg-blue-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <FadeIn>
+          <div className="text-center mb-16">
+            <h1 className="text-4xl md:text-7xl font-extrabold leading-normal tracking-tight mb-4">
+              Our<span className="bg-yellow-400 rounded"> Services </span>
+            </h1>
+          </div>
+        </FadeIn>
+
+        <div className="grid grid-cols-1 gap-8 w-10/12 mx-auto my-14">
+          <FadeIn>
+
+            <div className="flex w-full items-center justify-between gap-8">
+              <div className="w-[60%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-amber-50">
+                <div></div>
+                <div>
+
+                </div>
+              </div>
+              <div className="w-[40%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-yellow-100">
+                <div></div>
+                <div>
+
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <div className="flex w-full items-center justify-between gap-8">
+              <div className="w-[40%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-yellow-100">
+                <div></div>
+                <div>
+
+                </div>
+              </div>
+              <div className="w-[60%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-amber-50">
+                <div></div>
+                <div>
+
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+
+        </div>
+      </div>
+    </section>
+  );
+};
 const HowItWorksSection = () => {
   const steps = [
     {
@@ -231,108 +352,53 @@ const HowItWorksSection = () => {
 
   return (
     <section id="how-it-works" className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+      <div className="text-center mb-16">
+        <h1 className="text-4xl md:text-7xl font-extrabold leading-normal tracking-tight mb-4">
+          How It <span className="bg-yellow-400 rounded pr-4">Works</span>
+        </h1>
+      </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <FadeIn>
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              How It Works
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Simple steps for fast and reliable parcel delivery
-            </p>
-            <div className="w-24 h-1 bg-yellow-500 mx-auto mt-6 rounded"></div>
-          </div>
-        </FadeIn>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-10/12 mx-auto my-14">
           {steps.map((step, index) => (
-            <FadeIn key={step.id} delay={index * 200}>
+            <FadeIn key={step.id}>
               <div className="relative group">
-                {/* Step connector line */}
-                {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-16 -right-4 w-8 h-0.5 bg-gradient-to-r from-yellow-400 to-yellow-200 z-10"></div>
-                )}
-                
                 {/* Main card */}
-                <div 
-                  className="relative rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 p-8 text-center overflow-hidden group-hover:transform group-hover:scale-105 min-h-[340px] flex flex-col justify-center"
-                  style={{
-                    backgroundImage: `url(${step.backgroundImage})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat'
-                  }}
+                <div
+                  className={`w-full border border-1 border-gray-600 rounded-3xl h-[450px] ${index === 0 ? "bg-amber-50 " : index === 3 ? "bg-amber-50" : "bg-yellow-100"} p-8 flex flex-col justify-center items-center text-center cursor-pointer hover:shadow-lg transition-shadow duration-300`}
                 >
-                  {/* Dark overlay for text readability */}
-                  <div className="absolute inset-0 bg-black bg-opacity-60 group-hover:bg-opacity-50 transition-all duration-500"></div>
-                  
-                  {/* Additional gradient overlay */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${step.color} opacity-20 group-hover:opacity-30 transition-opacity duration-500`}></div>
-                  
-                  {/* Step number */}
-                  <div className="absolute -top-4 -right-4 w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg z-20">
-                    {step.id}
-                  </div>
+
+                  <Image
+                    src={step.backgroundImage}
+                    alt="Background"
+                    className="w-4/5 h-[180px] rounded-3xl mb-10 object-cover"
+                    width={100}
+                    height={100}
+                  />
 
                   {/* Content */}
                   <div className="relative z-10">
                     {/* Icon */}
-                    <div className="mb-6">
-                      {step.icon}
+                    <div className="mb-2">
+                      Step {index + 1}
                     </div>
 
                     {/* Text content */}
-                    <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-yellow-300 transition-colors duration-300 drop-shadow-lg">
+                    <h3 className="text-2xl font-bold mb-4">
                       {step.title}
                     </h3>
-                    <p className="text-gray-100 leading-relaxed drop-shadow-md">
+                    <p className="leading-relaxed">
                       {step.description}
                     </p>
                   </div>
-
-                  {/* Decorative bottom border */}
-                  <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 z-10"></div>
                 </div>
               </div>
             </FadeIn>
           ))}
         </div>
-
-        {/* Call to action */}
-        <FadeIn delay={800}>
-          <div className="text-center mt-16">
-            <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
-              <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h4 className="text-xl font-bold text-gray-900 mb-2">Ready to get started?</h4>
-              <p className="text-gray-600 mb-4">Join thousands of satisfied customers</p>
-              <button className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300"
-              
-              >
-                Get Started
-              </button>
-            </div>
-          </div>
-        </FadeIn>
       </div>
-
-      <style jsx>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.8s ease-out;
-        }
-      `}</style>
     </section>
   );
 };
-
-
 
 const WhyChooseUsSection = () => {
   const features = [
@@ -374,7 +440,7 @@ const WhyChooseUsSection = () => {
               <div className="group relative bg-white p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-2">
                 {/* Background Glow Effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-                
+
                 <div className="relative">
                   <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-6 transition-transform duration-300 group-hover:scale-110">
                     {feature.icon}
@@ -398,22 +464,26 @@ const WhyChooseUsSection = () => {
 
 const BusinessCTASection = () => {
   return (
-    <section className="py-20 bg-yellow-400">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <FadeIn>
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Run a Business in Lokoja?
+    <section
+      className="p-16 w-11/12 mx-auto rounded-3xl my-20 bg-cover bg-center bg-no-repeat relative"
+      style={{ backgroundImage: `url(${cta.src})` }}
+    >
+      <div className="absolute w-full h-full bg-black/50 top-0 left-0 rounded-3xl" />
+      <FadeIn delay={200}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between">
+          <div className="text-start">
+            <h2 className="text-5xl font-extrabold text-white mb-6">
+              Own a Business?
             </h2>
-            <p className="text-xl text-gray-800 mb-8 max-w-2xl mx-auto">
-              Partner with Parcel for reliable and efficient business deliveries.
+            <p className="text-lg text-white max-w-2xl">
+              Be it a startup or an established company, Partner with Parcel for reliable and efficient business deliveries.
             </p>
-            <button className="bg-white text-yellow-600 hover:bg-gray-100 px-8 py-3 rounded-md text-lg font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105 hover:-translate-y-1">
-              <Link href="mailto:hello@theparcel.com.ng">Contact Us for Business</Link>
-            </button>
           </div>
-        </FadeIn>
-      </div>
+          <button className="bg-white text-yellow-600 hover:bg-gray-100 px-8 py-3 rounded-md text-lg font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105 hover:-translate-y-1">
+            <Link href="mailto:hello@theparcel.com.ng">Contact Us</Link>
+          </button>
+        </div>
+      </FadeIn>
     </section>
   );
 };
@@ -427,42 +497,131 @@ const Footer = ({
   onOpenPrivacyModal: () => void;
 }) => {
   return (
-    <footer id="contact" className="bg-gray-900 text-white py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
+    // <footer id="contact" className="text-black py-12">
+    //   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    //     <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    //       <div>
+    //         <div className="flex items-center mb-4">
+    //           <Package className="w-6 h-6 text-yellow-500" />
+    //           <span className="ml-2 text-lg font-bold">Parcel</span>
+    //         </div>
+    //         <p className="text-gray-400 text-sm">
+    //           Your trusted logistics partner in Lokoja.
+    //         </p>
+    //       </div>
+    //       <div>
+    //         <h4 className="text-sm font-semibold text-gray-300 mb-2">Quick Links</h4>
+    //         <ul className="text-gray-400 text-sm space-y-2">
+    //           <li><Link href="#">Home</Link></li>
+    //           <li><Link href="#">About Us</Link></li>
+    //           <li><Link href="#">Services</Link></li>
+    //           <li><Link href="#">How it works</Link></li>
+    //           <li><Link href="#">Sign In</Link></li>
+    //           <li><Link href="#">Become a rider</Link></li>
+    //           <li><Link href="#">Become a vendor</Link></li>
+    //         </ul>
+    //       </div>
+    //       <div>
+    //         <h4 className="text-sm font-semibold text-gray-300 mb-2">Support</h4>
+    //         <ul className="text-gray-400 text-sm space-y-2">
+    //           <li><button onClick={onOpenTermsModal} className="text-left">Terms & Conditions</button></li>
+    //           <li><button onClick={onOpenPrivacyModal} className="text-left">Privacy Policy</button></li>
+    //           <li><Link href="#">Contact Support</Link></li>
+    //         </ul>
+    //       </div>
+    //       <div>
+    //         <h4 className="text-sm font-semibold text-gray-300 mb-2">Contact</h4>
+    //         <p className="text-gray-400 text-sm">📍 Lokoja, Nigeria</p>
+    //         <p className="text-gray-400 text-sm">📞 +234 70XXXXXXXX</p>
+    //         <p className="text-gray-400 text-sm">✉️ hello@theparcel.com.ng</p>
+    //       </div>
+    //     </div>
+    //     <div className="mt-8 border-t border-gray-800 pt-4 text-center text-gray-500 text-xs">
+    //       &copy; {new Date().getFullYear()} Parcel. All rights reserved.
+    //     </div>
+    //   </div>
+    // </footer>
+    <footer className="bg-white text-black py-24">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        {/* Top grid */}
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
+          {/* Brand */}
+          <div className="md:col-span-2">
             <div className="flex items-center mb-4">
-              <Package className="w-6 h-6 text-yellow-500" />
+              {/* Replace with your own logo */}
+              <Package className="w-8 h-8 text-yellow-500" />
               <span className="ml-2 text-lg font-bold">Parcel</span>
             </div>
-            <p className="text-gray-400 text-sm">
+            <p className="text-sm text-gray-600 leading-relaxed">
               Your trusted logistics partner in Lokoja.
             </p>
           </div>
+
+          {/* Quick Links (Products style) */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-300 mb-2">Quick Links</h4>
-            <ul className="text-gray-400 text-sm space-y-2">
-              <li><Link href="#">About Us</Link></li>
-              <li><Link href="#">Services</Link></li>
+            <h4 className="text-sm font-semibold mb-4">QUICK LINKS</h4>
+            <ul className="space-y-2 text-sm text-gray-700">
+              <li><Link href="#" className="text-left hover:underline">Home</Link></li>
+              <li><Link href="#" className="text-left hover:underline">Sign In</Link></li>
+              <li><Link href="#" className="text-left hover:underline">About Us</Link></li>
+              <li><Link href="#" className="text-left hover:underline">Services</Link></li>
+              <li><Link href="#" className="text-left hover:underline">Own a Store</Link></li>
+              <li><Link href="#" className="text-left hover:underline">How it works</Link></li>
+              <li><Link href="#" className="text-left hover:underline">Register as a rider</Link></li>
             </ul>
           </div>
+
+          {/* Support */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-300 mb-2">Support</h4>
-            <ul className="text-gray-400 text-sm space-y-2">
-              <li><button onClick={onOpenTermsModal} className="text-left">Terms & Conditions</button></li>
-              <li><button onClick={onOpenPrivacyModal} className="text-left">Privacy Policy</button></li>
-              <li><Link href="#">Contact Support</Link></li>
+            <h4 className="text-sm font-semibold mb-4">SUPPORT</h4>
+            <ul className="space-y-2 text-sm text-gray-700">
+              <li>
+                <button onClick={onOpenTermsModal} className="text-left hover:underline">
+                  Terms & Conditions
+                </button>
+              </li>
+              <li>
+                <button onClick={onOpenPrivacyModal} className="text-left hover:underline">
+                  Privacy Policy
+                </button>
+              </li>
+              <li><Link href="https://wa.me/2349037311304" className="text-left hover:underline">Contact Support</Link></li>
             </ul>
           </div>
+
+          {/* Contact */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold mb-4">CONTACT</h4>
+            <Link href={'https://www.google.com/maps/place/Lokoja'} className="text-sm text-gray-700 hover:underline">📍 Lokoja, Nigeria</Link> <br/>
+            <Link href={'tel:+2349037311304'} className="text-sm text-gray-700 hover:underline">📞 +234 9037311304</Link> <br/>
+            <Link href={'mailto:hello@theparcel.com.ng'} className="text-sm text-gray-700 hover:underline">✉️ hello@theparcel.com.ng</Link>
+          </div>
+
+          {/* Socials */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-300 mb-2">Contact</h4>
-            <p className="text-gray-400 text-sm">📍 Lokoja, Nigeria</p>
-            <p className="text-gray-400 text-sm">📞 +234 70XXXXXXXX</p>
-            <p className="text-gray-400 text-sm">✉️ hello@theparcel.com.ng</p>
+            <h4 className="text-sm font-semibold mb-4">FOLLOW US</h4>
+            <div className="flex space-x-4 text-gray-700">
+              <Link href="#"><FaInstagram className="w-5 h-5" /></Link>
+              <Link href="#"><FaTiktok className="w-5 h-5" /></Link>
+              <Link href="#"><FaTwitter className="w-5 h-5" /></Link>
+            </div>
           </div>
         </div>
-        <div className="mt-8 border-t border-gray-800 pt-4 text-center text-gray-500 text-xs">
-          &copy; {new Date().getFullYear()} Parcel. All rights reserved.
+
+        {/* Bottom row */}
+        <div className="mt-12 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500 border-t border-gray-200 pt-6">
+          <p>
+            &copy; {new Date().getFullYear()} Parcel. All rights reserved.
+          </p>
+          <div className="flex space-x-4 mt-2 md:mt-0">
+            <button onClick={onOpenPrivacyModal} className="hover:underline">
+              Privacy Policy
+            </button>
+            <span>&</span>
+            <button onClick={onOpenTermsModal} className="hover:underline">
+              Terms of Use
+            </button>
+          </div>
         </div>
       </div>
     </footer>
@@ -483,9 +642,10 @@ export default function ParcelApp() {
     <div className={`min-h-screen ${inter.className}`}>
       <Navigation />
       <HeroSection />
+      <AboutSection />
+      <ServiceSection />
       <HowItWorksSection />
-      <WhyChooseUsSection />
-      {/* <TestimonialsSection /> Added Testimonials Section */}
+      {/* <WhyChooseUsSection /> */}
       <BusinessCTASection />
       <Footer
         onOpenTermsModal={handleOpenTermsModal}
