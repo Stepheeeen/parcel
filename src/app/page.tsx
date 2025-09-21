@@ -6,6 +6,10 @@ import Link from "next/link";
 import delivery from "../../public/illustration/image.png";
 import about from "../../public/authentication/white-bg.png";
 import { useRouter } from "next/navigation";
+import ParcelDelivery from '../../public/services/parcel-delivery.jpg'
+import GuaranteedSafety from '../../public/services/guaranteed-safety.jpg'
+import RealtimeTracking from '../../public/services/real-time-tracking.jpg'
+import SamedayService from '../../public/services/same-day-service.jpg'
 import Image from "next/image";
 import { Package, Clock, MapPin, ShieldCheck, ArrowDownRight, ArrowRight, Instagram, Linkedin, Facebook, X, Twitter } from "lucide-react";
 import cta from '../../public/bg/cta-bg.jpg'
@@ -189,7 +193,7 @@ const AboutSection = () => {
   return (
     <section
       id="about"
-      className="relative scroll overflow-hidden bg-gray-100 h-screen w-full flex justify-center items-center rounded-3xl mt-12" // Removed bg-gradient classes
+      className="relative scroll overflow-hidden bg-orange-50 h-screen w-full flex justify-center items-center rounded-3xl mt-12" // Removed bg-gradient classes
     >
       <div className="max-w-full mx-auto pl-4 lg:pl-8 absolute z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 place-items-center gap-x-4">
@@ -274,32 +278,68 @@ const ServiceSection = () => {
           <FadeIn>
 
             <div className="flex w-full items-center justify-between gap-8">
-              <div className="w-[60%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-amber-50">
-                <div></div>
+              <div className="w-[60%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-amber-50 flex justify-between items-center p-8 gap-6">
+                <div className="w-full h-full">
+                  <Image
+                    alt="parcel delivery"
+                    src={ParcelDelivery}
+                    width={100}
+                    height={100}
+                    className="w-full h-full rounded-3xl object-cover"
+                  />
+                </div>
                 <div>
-
+                  <h2 className="text-2xl font-bold mb-4">Parcel Delivery</h2>
+                  <p>Fast, secure, and reliable delivery of packages across Lokoja city with full tracking support.</p>
                 </div>
               </div>
-              <div className="w-[40%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-yellow-100">
-                <div></div>
+              <div className="w-[40%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-yellow-100 p-8 space-y-8">
+                <div className="w-full h-1/2">
+                  <Image
+                    alt="parcel delivery"
+                    src={RealtimeTracking}
+                    width={100}
+                    height={100}
+                    className="w-full h-full rounded-3xl object-cover"
+                  />
+                </div>
                 <div>
-
+                  <h2 className="text-2xl font-bold mb-4">Real-Time Tracking</h2>
+                  <p>Know exactly where your package is with live GPS tracking updates from pickup to delivery.</p>
                 </div>
               </div>
             </div>
           </FadeIn>
           <FadeIn delay={200}>
             <div className="flex w-full items-center justify-between gap-8">
-              <div className="w-[40%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-yellow-100">
-                <div></div>
+              <div className="w-[40%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-yellow-100 p-8 space-y-8">
+                <div className="w-full h-1/2">
+                  <Image
+                    alt="same day service"
+                    src={SamedayService}
+                    width={100}
+                    height={100}
+                    className="w-full h-full rounded-3xl object-cover"
+                  />
+                </div>
                 <div>
-
+                  <h2 className="text-2xl font-bold mb-4">Same-Day Service</h2>
+                  <p>Get your parcels delivered the same day — perfect for urgent items and business needs.</p>
                 </div>
               </div>
-              <div className="w-[60%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-amber-50">
-                <div></div>
+              <div className="w-[60%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-amber-50 flex justify-between items-center p-8 gap-6">
+                <div className="w-full h-full">
+                  <Image
+                    alt="parcel delivery"
+                    src={GuaranteedSafety}
+                    width={100}
+                    height={100}
+                    className="w-full h-full rounded-3xl object-cover"
+                  />
+                </div>
                 <div>
-
+                  <h2 className="text-2xl font-bold mb-4">Guaranteed Safety</h2>
+                  <p>Every package is handled with care, ensuring safe delivery with our trusted team.</p>
                 </div>
               </div>
             </div>
@@ -467,6 +507,7 @@ const BusinessCTASection = () => {
     <section
       className="p-16 w-11/12 mx-auto rounded-3xl my-20 bg-cover bg-center bg-no-repeat relative"
       style={{ backgroundImage: `url(${cta.src})` }}
+      id="contact"
     >
       <div className="absolute w-full h-full bg-black/50 top-0 left-0 rounded-3xl" />
       <FadeIn delay={200}>
@@ -592,8 +633,8 @@ const Footer = ({
           {/* Contact */}
           <div className="space-y-2">
             <h4 className="text-sm font-semibold mb-4">CONTACT</h4>
-            <Link href={'https://www.google.com/maps/place/Lokoja'} className="text-sm text-gray-700 hover:underline">📍 Lokoja, Nigeria</Link> <br/>
-            <Link href={'tel:+2349037311304'} className="text-sm text-gray-700 hover:underline">📞 +234 9037311304</Link> <br/>
+            <Link href={'https://www.google.com/maps/place/Lokoja'} className="text-sm text-gray-700 hover:underline">📍 Lokoja, Nigeria</Link> <br />
+            <Link href={'tel:+2349037311304'} className="text-sm text-gray-700 hover:underline">📞 +234 9037311304</Link> <br />
             <Link href={'mailto:hello@theparcel.com.ng'} className="text-sm text-gray-700 hover:underline">✉️ hello@theparcel.com.ng</Link>
           </div>
 
