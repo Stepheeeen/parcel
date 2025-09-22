@@ -11,7 +11,7 @@ import GuaranteedSafety from '../../public/services/guaranteed-safety.jpg'
 import RealtimeTracking from '../../public/services/real-time-tracking.jpg'
 import SamedayService from '../../public/services/same-day-service.jpg'
 import Image from "next/image";
-import { Package, Clock, MapPin, ShieldCheck, ArrowDownRight, ArrowRight, Instagram, Linkedin, Facebook, X, Twitter } from "lucide-react";
+import { Package, Clock, MapPin, ShieldCheck, ArrowDownRight, ArrowRight, Instagram, Linkedin, Facebook, X, Twitter, Menu } from "lucide-react";
 import cta from '../../public/bg/cta-bg.jpg'
 import { PrivacyPolicyModal, TermsAndConditionsModal } from "@/components/Auth/TermsandPolicy";
 
@@ -76,67 +76,99 @@ const FadeIn = ({ children, className = "", delay = 0 }: FadeInProps) => {
   );
 };
 
-// Navigation Component
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 0);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 0);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <nav className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-7/12 max-w-6xl rounded-2xl bg-white/80 border border-gray-200 shadow-md backdrop-blur-md px-2 ${isScrolled ? "bg-white shadow-md" : "bg-transparent"
-      }`}>
-      {/* <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 `}
-    > */}
+    <nav
+      className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-11/12 md:w-7/12 max-w-6xl rounded-2xl border shadow-md backdrop-blur-md px-2 transition-colors duration-300 ${isScrolled ? "bg-white border-gray-200 shadow-md" : "bg-white/80"
+        }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
+          {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
               <Package className="w-8 h-8 text-yellow-500" />
-              <span className={`ml-2 text-xl font-bold ${isScrolled ? "text-gray-900" : ""}`}>
+              <span
+                className={`ml-2 text-xl font-bold ${isScrolled ? "text-gray-900" : "text-gray-900"
+                  }`}
+              >
                 Parcel
               </span>
             </div>
           </div>
 
+          {/* Desktop Links */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-2">
-              <Link href="#home" className={`px-3 py-2 text-sm font-medium transition-colors ${isScrolled ? "text-gray-900 hover:text-yellow-600" : "text-gray-900 hover:text-yellow-600"}`}>
-                Home
-              </Link>
-              <Link href="#about" className={`px-3 py-2 text-sm font-medium transition-colors ${isScrolled ? "text-gray-900 hover:text-yellow-600" : "text-gray-900 hover:text-yellow-600"}`}>
-                About
-              </Link>
-              <Link href="#service" className={`px-3 py-2 text-sm font-medium transition-colors ${isScrolled ? "text-gray-900 hover:text-yellow-600" : "text-gray-900 hover:text-yellow-600"}`}>
-                Services
-              </Link>
-              {/* <Link href="#how-it-works" className={`px-3 py-2 text-sm font-medium transition-colors ${isScrolled ? "text-gray-900 hover:text-yellow-600" : "text-gray-900 hover:text-yellow-600"}`}>
-                Get Started
-              </Link> */}
-              <Link href="#contact" className={`px-3 py-2 text-sm font-medium transition-colors ${isScrolled ? "text-gray-900 hover:text-yellow-600" : "text-gray-900 hover:text-yellow-600"}`}>
-                Contact
-              </Link>
+              {["Home", "About", "Services", "Contact"].map((item) => (
+                <Link
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  className={`px-3 py-2 text-sm font-medium transition-colors ${isScrolled
+                    ? "text-gray-900 hover:text-yellow-600"
+                    : "text-gray-900 hover:text-yellow-600"
+                    }`}
+                >
+                  {item}
+                </Link>
+              ))}
             </div>
           </div>
 
+          {/* Auth + Mobile Button */}
           <div className="flex items-center">
             <button
-              className="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105"
+              className="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 hidden md:block"
               onClick={() => router.push("/authentication/signin")}
             >
               Sign In
             </button>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              className="md:hidden ml-4 p-2 rounded-md text-gray-800 hover:bg-gray-100"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Dropdown */}
+      {isOpen && (
+        <div className="md:hidden px-4 pb-4 space-y-2">
+          {["Home", "About", "Services", "Contact"].map((item) => (
+            <Link
+              key={item}
+              href={`#${item.toLowerCase()}`}
+              className="block px-3 py-2 text-sm font-medium text-gray-900 hover:text-yellow-600 transition-colors"
+              onClick={() => setIsOpen(false)} // close after click
+            >
+              {item}
+            </Link>
+          ))}
+          <button
+            className="w-full bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105"
+            onClick={() => {
+              setIsOpen(false);
+              router.push("/authentication/signin");
+            }}
+          >
+            Sign In
+          </button>
+        </div>
+      )}
     </nav>
   );
 };
@@ -147,22 +179,21 @@ const HeroSection = () => {
   return (
     <section
       id="home"
-      className="relative scroll pt-20 overflow-hidden bg-white h-screen" // Removed bg-gradient classes
+      className="relative scroll pt-20 overflow-hidden bg-white h-screen"
     >
 
-      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 place-items-center">
-          <div className="text-center pt-16">
-            <FadeIn>
-              <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold leading-normal tracking-tight">
-                Fast and Reliable <br />
-                <span className="bg-yellow-400 rounded">Delivery </span>Service
-              </h1>
-              <p className="text-lg md:text-xl text-gray-500 max-w-md leading-relaxed my-4 text-center mx-auto">
-                Send packages across Lokoja city with tracking and guaranteed
-                delivery. <br /> The future of logistics.
-              </p>
-              {/* <div className="flex flex-row items-center">
+      <div className="max-w-full mx-auto px-1 md:px-6 lg:px-8 relative z-10 grid grid-cols-1 place-items-center">
+        <div className="text-center pt-16">
+          <FadeIn>
+            <h1 className="text-5xl md:text-5xl lg:text-7xl font-extrabold leading-normal tracking-tight">
+              Fast and Reliable <br />
+              <span className="bg-yellow-400 rounded">Delivery </span>Service
+            </h1>
+            <p className="text-lg md:text-xl text-gray-500 max-w-md leading-relaxed my-4 text-center mx-auto">
+              Send packages across Lokoja city with tracking and guaranteed
+              delivery. <br /> The future of logistics.
+            </p>
+            {/* <div className="flex flex-row items-center">
                 <button
                   className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 rounded-md text-lg font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105 hover:-translate-y-1"
                   onClick={() => router.push("/authentication/signup")}
@@ -170,70 +201,73 @@ const HeroSection = () => {
                   Send Parcel Now
                 </button>
               </div> */}
-            </FadeIn>
-          </div>
-
-          <FadeIn delay={200}>
-            <div className="w-full">
-              <Image
-                src={delivery}
-                alt="Delivery Illustration"
-                className="h-2/3"
-                priority
-              />
-            </div>
           </FadeIn>
         </div>
+
+        <FadeIn delay={200} className="hidden md:flex">
+          <div className="w-full">
+            <Image
+              src={delivery}
+              alt="Delivery Illustration"
+              className="h-2/3"
+              priority
+            />
+          </div>
+        </FadeIn>
       </div>
     </section>
   );
 };
 const AboutSection = () => {
   const router = useRouter();
+
   return (
     <section
       id="about"
-      className="relative scroll overflow-hidden bg-orange-50 h-screen w-full flex justify-center items-center rounded-3xl mt-12" // Removed bg-gradient classes
+      className="relative scroll overflow-hidden bg-orange-50 w-full flex justify-center items-center rounded-3xl mt-12 py-16 md:py-24"
     >
-      <div className="max-w-full mx-auto pl-4 lg:pl-8 absolute z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 place-items-center gap-x-4">
+      <div className="w-full max-w-7xl mx-auto px-4 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-x-12 place-items-center">
+          {/* Left Text */}
           <FadeIn>
-            <h1 className="text-4xl md:text-7xl font-extrabold leading-normal tracking-tight mb-4">
-              <span className="bg-yellow-400 rounded">About </span>Us
-            </h1>
-            <div className="mt-8">
-              {/* <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold leading-normal tracking-tight">
-                Fast and Reliable <br />
-                <span className="bg-yellow-400 rounded">Delivery </span>Service
-              </h1> */}
-              <p className="text-lg text-gray-700 leading-relaxed mb-4">
-                At <span className="font-semibold text-gray-900">Parcel</span>, we
-                make local deliveries simple, reliable, and transparent. Our mission
-                is to help individuals and businesses send packages{" "}
-                <span className="font-medium text-yellow-600">
-                  seamlessly across Lokoja city
-                </span>
-                , backed by real-time tracking and guaranteed delivery.
-              </p>
+            <div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold leading-tight tracking-tight mb-6">
+                <span className="bg-yellow-400 rounded">About </span>Us
+              </h1>
 
-              <p className="text-lg text-gray-700 leading-relaxed mb-4">
-                We believe the <span className="font-semibold">future of logistics</span>{" "}
-                is built on trust, speed, and technology. That’s why we combine a
-                dedicated delivery network with smart tools that give you full
-                visibility from pickup to drop-off.
-              </p>
+              <div className="space-y-4 md:space-y-6">
+                <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
+                  At{" "}
+                  <span className="font-semibold text-gray-900">Parcel</span>, we
+                  make local deliveries simple, reliable, and transparent. Our mission
+                  is to help individuals and businesses send packages{" "}
+                  <span className="font-medium text-yellow-600">
+                    seamlessly across Lokoja city
+                  </span>
+                  , backed by real-time tracking and guaranteed delivery.
+                </p>
 
-              <p className="text-lg text-gray-700 leading-relaxed">
-                Whether it’s a personal item or a business shipment, Parcel ensures
-                that every delivery is handled with care, efficiency, and
-                accountability. We’re more than just a courier — we’re your logistics
-                partner for the modern city.
-              </p>
+                <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
+                  We believe the{" "}
+                  <span className="font-semibold">future of logistics</span> is built
+                  on trust, speed, and technology. That’s why we combine a dedicated
+                  delivery network with smart tools that give you full visibility from
+                  pickup to drop-off.
+                </p>
+
+                <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
+                  Whether it’s a personal item or a business shipment, Parcel ensures
+                  that every delivery is handled with care, efficiency, and
+                  accountability. We’re more than just a courier — we’re your
+                  logistics partner for the modern city.
+                </p>
+              </div>
             </div>
           </FadeIn>
 
-          <FadeIn delay={200}>
-            <div className="relative w-full h-screen">
+          {/* Right Image */}
+          <FadeIn delay={200} className="hidden md:block">
+            <div className="relative w-full h-64 sm:h-80 md:h-[28rem] lg:h-[36rem] rounded-xl overflow-hidden">
               {/* Background Image */}
               <Image
                 src={about}
@@ -242,21 +276,20 @@ const AboutSection = () => {
                 priority
               />
 
-              {/* Overlay */}
-              <div className="absolute bg-white/50" />
+              {/* White overlay for contrast */}
+              <div className="absolute inset-0 bg-white/40" />
 
-              {/* Centered Content */}
+              {/* Centered Logo Content */}
               <div className="absolute inset-0 flex items-center justify-center z-10">
-                <div className="flex items-center bg-white px-10 py-6">
-                  <Package className="w-32 h-32 text-gray-900" />
-                  <span className="ml-4 text-7xl font-extrabold text-gray-900">
+                <div className="flex items-center bg-white/90 px-6 py-4 md:px-10 md:py-6">
+                  <Package className="w-16 h-16 md:w-24 md:h-24 text-gray-900" />
+                  <span className="ml-3 md:ml-6 text-3xl md:text-5xl lg:text-7xl font-extrabold text-gray-900">
                     Parcel
                   </span>
                 </div>
               </div>
             </div>
           </FadeIn>
-
         </div>
       </div>
     </section>
@@ -265,7 +298,7 @@ const AboutSection = () => {
 const ServiceSection = () => {
   return (
     <section id="service" className="py-20 bg-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <FadeIn>
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-7xl font-extrabold leading-normal tracking-tight mb-4">
@@ -277,9 +310,9 @@ const ServiceSection = () => {
         <div className="grid grid-cols-1 gap-8 w-10/12 mx-auto my-14">
           <FadeIn>
 
-            <div className="flex w-full items-center justify-between gap-8">
-              <div className="w-[60%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-amber-50 flex justify-between items-center p-8 gap-6">
-                <div className="w-full h-full">
+            <div className="space-y-8 md:space-y-0 md:flex w-full items-center justify-between gap-8">
+              <div className="w-full md:w-[60%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-amber-50 md:flex justify-between items-center p-8 gap-6 space-y-8 md:space-y-0">
+                <div className="w-full h-1/2 md:h-full">
                   <Image
                     alt="parcel delivery"
                     src={ParcelDelivery}
@@ -293,7 +326,7 @@ const ServiceSection = () => {
                   <p>Fast, secure, and reliable delivery of packages across Lokoja city with full tracking support.</p>
                 </div>
               </div>
-              <div className="w-[40%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-yellow-100 p-8 space-y-8">
+              <div className="w-full md:w-[40%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-yellow-100 p-8 space-y-8">
                 <div className="w-full h-1/2">
                   <Image
                     alt="parcel delivery"
@@ -311,8 +344,8 @@ const ServiceSection = () => {
             </div>
           </FadeIn>
           <FadeIn delay={200}>
-            <div className="flex w-full items-center justify-between gap-8">
-              <div className="w-[40%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-yellow-100 p-8 space-y-8">
+            <div className="space-y-8 md:space-y-0 md:flex w-full items-center justify-between gap-8">
+              <div className="w-full md:w-[40%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-yellow-100 p-8 space-y-8">
                 <div className="w-full h-1/2">
                   <Image
                     alt="same day service"
@@ -327,8 +360,8 @@ const ServiceSection = () => {
                   <p>Get your parcels delivered the same day — perfect for urgent items and business needs.</p>
                 </div>
               </div>
-              <div className="w-[60%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-amber-50 flex justify-between items-center p-8 gap-6">
-                <div className="w-full h-full">
+              <div className="w-full md:w-[60%] border border-1 border-gray-600 rounded-3xl h-[400px] bg-amber-50 md:flex justify-between items-center p-8 gap-6 space-y-8  md:space-y-0">
+                <div className="w-full h-1/2 md:h-full">
                   <Image
                     alt="parcel delivery"
                     src={GuaranteedSafety}
@@ -397,7 +430,7 @@ const HowItWorksSection = () => {
           How It <span className="bg-yellow-400 rounded pr-4">Works</span>
         </h1>
       </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-10/12 mx-auto my-14">
           {steps.map((step, index) => (
             <FadeIn key={step.id}>
@@ -410,7 +443,7 @@ const HowItWorksSection = () => {
                   <Image
                     src={step.backgroundImage}
                     alt="Background"
-                    className="w-4/5 h-[180px] rounded-3xl mb-10 object-cover"
+                    className="w-11/12 h-[180px] rounded-3xl mb-10 object-cover"
                     width={100}
                     height={100}
                   />
@@ -511,12 +544,12 @@ const BusinessCTASection = () => {
     >
       <div className="absolute w-full h-full bg-black/50 top-0 left-0 rounded-3xl" />
       <FadeIn delay={200}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between">
-          <div className="text-start">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between space-y-8 md:space-y-0">
+          <div className="text-center md:text-start">
             <h2 className="text-5xl font-extrabold text-white mb-6">
               Own a Business?
             </h2>
-            <p className="text-lg text-white max-w-2xl">
+            <p className="text-md md:text-lg text-white max-w-2xl">
               Be it a startup or an established company, Partner with Parcel for reliable and efficient business deliveries.
             </p>
           </div>
